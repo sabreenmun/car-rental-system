@@ -1,0 +1,102 @@
+
+.register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f7fa; /* Light background color */
+}
+
+
+.form {
+    background-color: #ffffff; /* White background for the form */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Limits the form width */
+}
+
+
+.form-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333; /* Dark text color */
+}
+
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+
+input::placeholder {
+    color: #888;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #ca8b50;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #a86628;
+}
+
+
+a {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .form {
+        padding: 15px;
+        width: 90%; 
+    }
+
+    .form-title {
+        font-size: 20px;
+    }
+
+    button[type="submit"] {
+        font-size: 14px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        font-size: 14px;
+    }
+}
