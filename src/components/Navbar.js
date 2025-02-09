@@ -7,7 +7,7 @@ function Navbar() {
   return (
     <nav>
       <Link to="/" className="title">
-        DriveConnect Solutions
+        DriveShare
       </Link>
       <div
         className="menu"
