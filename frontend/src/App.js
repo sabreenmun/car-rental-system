@@ -7,7 +7,7 @@ import Help from "./pages/Help";
 import SearchCars from "./pages/SearchCars";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import "./App.css";
+import "./styles/App.css";
 import Footer from "./components/Footer";
 function App() {
   const [user, setUser] = useState(null); //log in or not

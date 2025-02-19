@@ -1,9 +1,11 @@
+
+  
   .home-page{
     display: flex;
     flex-direction: column;
     justify-content: flex-star;
     align-items: center; 
-    height: 100vh; 
+
   }
   
   .main-area1{
