@@ -1,9 +1,5 @@
-// db.js
-const mysql = require('mysql2');
-const dotenv = require('dotenv');
-
-// load environment variables from .env file
-dotenv.config();
+require("dotenv").config();
+const mysql = require("mysql2");
 
 // create a connection to the database
 const db = mysql.createConnection({
@@ -16,10 +12,10 @@ const db = mysql.createConnection({
 // connect to the database
 db.connect((err) => {
   if (err) {
-    console.error('Error connecting to the database:', err);
+    console.error("Error connecting to the database:", err);
     return;
   }
-  console.log('Connected to the database');
+  console.log("Connected to the database");
 });
 
 module.exports = db;

@@ -1,19 +1,19 @@
---database creation
+-- Create the database
 CREATE DATABASE IF NOT EXISTS drive_share;
 USE drive_share;
 
---table to store users
+-- Create Users table
 CREATE TABLE Users (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
     FirstName VARCHAR(50) NOT NULL,
     LastName VARCHAR(50) NOT NULL,
     Email VARCHAR(100) UNIQUE NOT NULL,
     PasswordHash VARCHAR(255) NOT NULL,
-    UserType ENUM('Owner', 'Renter') NOT NULL,
+    UserType ENUM('Owner', 'Renter', 'Both') NOT NULL,
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---table to store security questions
+-- Create SecurityQuestions table
 CREATE TABLE SecurityQuestions (
     QuestionID INT AUTO_INCREMENT PRIMARY KEY,
     UserID INT NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE SecurityQuestions (
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
---table to store cars
+-- Create Cars table
 CREATE TABLE Cars (
     CarID INT AUTO_INCREMENT PRIMARY KEY,
     OwnerID INT NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE Cars (
     FOREIGN KEY (OwnerID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
---table to store bookings
+-- Create Bookings table
 CREATE TABLE Bookings (
     BookingID INT AUTO_INCREMENT PRIMARY KEY,
     CarID INT NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE Bookings (
     FOREIGN KEY (RenterID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
---table to store payment
+-- Create Payments table
 CREATE TABLE Payments (
     PaymentID INT AUTO_INCREMENT PRIMARY KEY,
     BookingID INT NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE Payments (
     FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE CASCADE
 );
 
---table to store reviews and ratings
+-- Create Reviews table
 CREATE TABLE Reviews (
     ReviewID INT AUTO_INCREMENT PRIMARY KEY,
     BookingID INT NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE Reviews (
     FOREIGN KEY (RevieweeID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
--- table to store messages
+-- Create Messages table
 CREATE TABLE Messages (
     MessageID INT AUTO_INCREMENT PRIMARY KEY,
     SenderID INT NOT NULL,

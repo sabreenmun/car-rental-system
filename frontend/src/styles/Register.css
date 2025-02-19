@@ -1,118 +1,107 @@
+/* Register.css */
 .register-page {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f7fa; /* Light background color */
-}
-
-.form {
-    background-color: #ffffff; /* White background for the form */
-    padding: 20px;
+    flex-direction: column;
+    justify-content: flex-star;
+    align-items: center; 
+  }
+  
+  .form {
+    background-color: #fff;
+    padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px; /* Limits the form width */
-}
-
-.form-title {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
+    max-width: 400px;
+  }
+  
+  .form-title {
+    font-size: 2rem;
     margin-bottom: 20px;
-    color: #333; /* Dark text color */
-}
-
-label {
+    text-align: center;
+    color: #333;
+  }
+  
+  label {
+    font-size: 1rem;
+    margin-bottom: 8px;
     display: block;
-    margin-bottom: 10px;
-}
-
-input[type="email"],
-input[type="password"],
-input[type="text"],
-select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-select {
-    -webkit-appearance: none; /* Remove default dropdown styling in some browsers */
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path fill="none" stroke="#888" stroke-width="2" d="M1 1l4 4 4-4"/></svg>'); /* Custom dropdown icon */
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 30px; /* Space for the dropdown arrow */
-}
-
-input::placeholder {
-    color: #888;
-}
-
-button[type="submit"] {
+    color: #666;
+  }
+  
+  input,
+  select,
+  button {
     width: 100%;
     padding: 12px;
-    background-color: #ca8b50;
-    color: #ffffff;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  input:focus,
+  select:focus,
+  button:focus {
+    outline: none;
+    border-color: #007BFF;
+  }
+  
+  button {
+    background-color: #007BFF;
+    color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button[type="submit"]:hover {
-    background-color: #a86628;
-}
-
-.error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 15px;
-}
-
-.error-message ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-a {
-    display: block;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  button:active {
+    background-color: #003f7f;
+  }
+  
+  .error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .error-message p {
+    margin: 0;
+  }
+  
+  .navlink {
     text-align: center;
-    margin-top: 15px;
-    font-size: 14px;
-    color: #007bff;
+    margin-top: 20px;
+  }
+  
+  .navlink a {
+    color: #007BFF;
     text-decoration: none;
-}
-
-a:hover {
+    font-size: 1rem;
+  }
+  
+  .navlink a:hover {
     text-decoration: underline;
-}
-
-@media (max-width: 480px) {
+  }
+  
+  /* Mobile Responsiveness */
+  @media (max-width: 480px) {
     .form {
-        padding: 15px;
-        width: 90%; 
+      padding: 20px;
     }
-
+  
     .form-title {
-        font-size: 20px;
+      font-size: 1.5rem;
     }
-
-    button[type="submit"] {
-        font-size: 14px;
+  
+    input, select, button {
+      font-size: 0.9rem;
     }
-
-    input[type="email"],
-    input[type="password"],
-    input[type="text"],
-    select {
-        font-size: 14px;
-    }
-}
+  }
+  

@@ -22,7 +22,7 @@ function Home() {
         </p>
         <div className="home-buttons">
           <Link to="/login" className="btn">Login</Link>
-          <Link to="/register" className="btn">Register</Link>
+          <Link to="/register" className="btn">Join Now</Link>
         </div>
       </div>
 

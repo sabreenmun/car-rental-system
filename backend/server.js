@@ -1,23 +1,22 @@
-// server.js
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const db = require("./db"); // import MySQL connection from db.js
 
-// Initialize environment variables
-dotenv.config();
-
-const app = express();
-
-// Middleware
-app.use(express.json());
+// middleware
 app.use(cors());
+app.use(express.json()); // parse the JSON requests
 
-//api postings
-//app.post('/register', registerUser);
-//app.post('/login', loginUser);
+// test route
+app.get("/", (req, res) => {
+  res.send("Welcome to Drive Share API!");
+});
+app.get
 
-// Start the server
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+
+// start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

@@ -1,42 +1,44 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import "../styles/Register.css";
+import { NavLink } from 'react-router-dom';
 
 function Register() {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [sq_1, setSq1] = useState('What was the name of your first pet?');
-    const [sa_1, setSa1] = useState('');
-    const [sq_2, setSq2] = useState('What is your mother\'s maiden name?');
-    const [sa_2, setSa2] = useState('');
-    const [sq_3, setSq3] = useState('What is the name of the city you were born in?');
-    const [sa_3, setSa3] = useState('');
-    const [message, setMessage] = useState('');
-    const [errors, setErrors] = useState([]);
+    const [userType, setUserType] = useState('Owner'); // Default to 'Owner', can be 'Renter' or 'Both'
+
+    // State for security answers
+    const [answer1, setAnswer1] = useState('');
+    const [answer2, setAnswer2] = useState('');
+    const [answer3, setAnswer3] = useState('');
+    
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
+        // Collecting user data along with security answers
         const userData = {
-          email,
-          password,
-          sq_1,
-          sa_1,
-          sq_2,
-          sa_2,
-          sq_3,
-          sa_3
+            firstName,
+            lastName,
+            email,
+            password,
+            userType,
+            securityAnswer1: answer1,
+            securityAnswer2: answer2,
+            securityAnswer3: answer3
         };
 
         try {
             const response = await axios.post('http://localhost:5000/register', userData);
-            setMessage(response.data.message);
             navigate('/login');
         } catch (error) {
-            setMessage('Error registering user');
+            setError('Error registering user. Please try again.');
         }
     };
 
@@ -45,11 +47,34 @@ function Register() {
             <form className="form" id="register" onSubmit={handleRegister}>
                 <h1 className="form-title">Register</h1>
 
+                {/* First Name input */}
+                <label>
+                    <input
+                        type="text"
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                    />
+                </label>
+                <br />
+
+                {/* Last Name input */}
+                <label>
+                    <input
+                        type="text"
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                    />
+                </label>
+                <br />
+
                 {/* Email input */}
                 <label>
                     <input
                         type="email"
-                        name="email"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -62,7 +87,6 @@ function Register() {
                 <label>
                     <input
                         type="password"
-                        name="password"
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -71,13 +95,26 @@ function Register() {
                 </label>
                 <br />
 
+                {/* User Type selection */}
+                <label>
+                    <select
+                        value={userType}
+                        onChange={(e) => setUserType(e.target.value)}
+                        required
+                    >
+                        <option value="Owner">Owner</option>
+                        <option value="Renter">Renter</option>
+                        <option value="Both">Both</option>
+                    </select>
+                </label>
+                <br />
+
                 {/* Security Question 1 */}
                 <label>What was the name of your first pet?</label>
                 <input
                     type="text"
-                    name="answer1"
-                    value={sa_1}
-                    onChange={(e) => setSa1(e.target.value)}
+                    value={answer1}
+                    onChange={(e) => setAnswer1(e.target.value)}
                     required
                 />
                 <br />
@@ -86,9 +123,8 @@ function Register() {
                 <label>What is your mother's maiden name?</label>
                 <input
                     type="text"
-                    name="answer2"
-                    value={sa_2}
-                    onChange={(e) => setSa2(e.target.value)}
+                    value={answer2}
+                    onChange={(e) => setAnswer2(e.target.value)}
                     required
                 />
                 <br />
@@ -97,9 +133,8 @@ function Register() {
                 <label>What is the name of the city you were born in?</label>
                 <input
                     type="text"
-                    name="answer3"
-                    value={sa_3}
-                    onChange={(e) => setSa3(e.target.value)}
+                    value={answer3}
+                    onChange={(e) => setAnswer3(e.target.value)}
                     required
                 />
                 <br />
@@ -107,18 +142,16 @@ function Register() {
                 {/* Submit button */}
                 <button type="submit">Register</button>
 
-                {/* Display error messages */}
-                {errors.length > 0 && (
-                    <div id="error-message" className="error-message">
-                        <ul>
-                            {errors.map((message, index) => (
-                                <li key={index}>{message}</li>
-                            ))}
-                        </ul>
+                {/* Display error message */}
+                {error && (
+                    <div className="error-message">
+                        <p>{error}</p>
                     </div>
                 )}
 
                 {/* Link to login page */}
+               
+
                 <NavLink to="/login">Already have an account? Login</NavLink>
             </form>
         </div>
