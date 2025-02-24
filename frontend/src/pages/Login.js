@@ -1,88 +1,81 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate from 'react-router-dom'
-
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/Login.css";
 
 function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate(); // Declare navigate here, use it to navigate
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
+  const navigate = useNavigate();
 
-        // Validation
-        if (!email || !password) {
-            setError("Please fill in both fields");
-            return;
-        }
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-        try {
-            const response = await fetch("http://localhost:5000/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
+    try {
+      // Clear previous error messages
+      setErrorMessage("");
 
-            const data = await response.json();
+      // Send login request to server
+      const response = await axios.post("http://localhost:3000/login", {
+        email,
+        password,
+      });
 
-            if (response.status === 200) {
-                // Store JWT in localStorage
-                localStorage.setItem("authToken", data.token);
-                // Redirect to dashboard
-                navigate('/dashboard'); // Use navigate to redirect to dashboard
-            } else {
-                setError(data.message || "Login failed.");
-            }
-        } catch (error) {
-            setError("An error occurred while logging in.");
-        }
-    };
+      // If login is successful, redirect to Dashboard
+      if (response.status === 200) {
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("Error:", error);
 
-    return (
-        <div className="login-page">
-            <form className="form" id="login" onSubmit={handleLogin}>
-                <h1 className="form-title">Login</h1>
+      // If login failed, display error message
+      setErrorMessage("Your Email and Password are incorrect.");
+    }
+  };
 
-                {/* Email input */}
-                <label>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </label>
-                <br />
+  return (
+    <div className="login-page">
+      <form className="form" id="login" onSubmit={handleLogin}>
+        <h1 className="form-title">Login</h1>
 
-                {/* Password input */}
-                <label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </label>
-                <br />
+        {/* Email input */}
+        <label>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </label>
+        <br />
 
-                {/* Submit button */}
-                <button type="submit">Login</button>
+        {/* Password input */}
+        <label>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </label>
+        <br />
 
-                {/* Display error message */}
-                {error && (
-                    <div id="error-message" className="error-message">
-                        {error}
-                    </div>
-                )}
-            </form>
-        </div>
-    );
+        {/* Submit button */}
+        <button type="submit">Login</button>
+
+        {/* Display error message */}
+        {errorMessage && (
+          <div className="error-message">
+            <p>{errorMessage}</p>
+          </div>
+        )}
+      </form>
+    </div>
+  );
 }
 
 export default Login;

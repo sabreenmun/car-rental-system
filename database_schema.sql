@@ -1,91 +1,119 @@
 -- Create the database
-CREATE DATABASE IF NOT EXISTS drive_share;
-USE drive_share;
+CREATE DATABASE IF NOT EXISTS DriveShare;
+USE DriveShare;
 
--- Create Users table
-CREATE TABLE Users (
-    UserID INT AUTO_INCREMENT PRIMARY KEY,
-    FirstName VARCHAR(50) NOT NULL,
-    LastName VARCHAR(50) NOT NULL,
-    Email VARCHAR(100) UNIQUE NOT NULL,
-    PasswordHash VARCHAR(255) NOT NULL,
-    UserType ENUM('Owner', 'Renter', 'Both') NOT NULL,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Users Table
+CREATE TABLE IF NOT EXISTS Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    security_question_1 VARCHAR(255) NOT NULL,
+    security_answer_1 VARCHAR(255) NOT NULL,
+    security_question_2 VARCHAR(255) NOT NULL,
+    security_answer_2 VARCHAR(255) NOT NULL,
+    security_question_3 VARCHAR(255) NOT NULL,
+    security_answer_3 VARCHAR(255) NOT NULL,
+    user_type ENUM('owner', 'renter') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Create SecurityQuestions table
-CREATE TABLE SecurityQuestions (
-    QuestionID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT NOT NULL,
-    Question1 VARCHAR(255) NOT NULL,
-    Answer1 VARCHAR(255) NOT NULL,
-    Question2 VARCHAR(255) NOT NULL,
-    Answer2 VARCHAR(255) NOT NULL,
-    Question3 VARCHAR(255) NOT NULL,
-    Answer3 VARCHAR(255) NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+-- Cars Table
+CREATE TABLE IF NOT EXISTS Cars (
+    car_id INT AUTO_INCREMENT PRIMARY KEY,
+    owner_id INT NOT NULL,
+    car_model VARCHAR(255) NOT NULL,
+    car_year INT NOT NULL,
+    mileage INT NOT NULL,
+    pickup_location VARCHAR(255) NOT NULL,
+    rental_price_per_day DECIMAL(10, 2) NOT NULL,
+    availability_calendar JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (owner_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Create Cars table
-CREATE TABLE Cars (
-    CarID INT AUTO_INCREMENT PRIMARY KEY,
-    OwnerID INT NOT NULL,
-    Model VARCHAR(100) NOT NULL,
-    Year INT NOT NULL,
-    Mileage INT NOT NULL,
-    AvailabilityStart DATE NOT NULL,
-    AvailabilityEnd DATE NOT NULL,
-    PickupLocation VARCHAR(255) NOT NULL,
-    PricePerDay DECIMAL(10, 2) NOT NULL,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (OwnerID) REFERENCES Users(UserID) ON DELETE CASCADE
+-- Bookings Table
+CREATE TABLE IF NOT EXISTS Bookings (
+    booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    car_id INT NOT NULL,
+    renter_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    total_cost DECIMAL(10, 2) NOT NULL,
+    booking_status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE,
+    FOREIGN KEY (renter_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Create Bookings table
-CREATE TABLE Bookings (
-    BookingID INT AUTO_INCREMENT PRIMARY KEY,
-    CarID INT NOT NULL,
-    RenterID INT NOT NULL,
-    StartDate DATE NOT NULL,
-    EndDate DATE NOT NULL,
-    TotalPrice DECIMAL(10, 2) NOT NULL,
-    Status ENUM('Pending', 'Confirmed', 'Cancelled') DEFAULT 'Pending',
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (CarID) REFERENCES Cars(CarID) ON DELETE CASCADE,
-    FOREIGN KEY (RenterID) REFERENCES Users(UserID) ON DELETE CASCADE
+-- Payments Table
+CREATE TABLE IF NOT EXISTS Payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_status ENUM('pending', 'completed') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (booking_id) REFERENCES Bookings(booking_id) ON DELETE CASCADE
 );
 
--- Create Payments table
-CREATE TABLE Payments (
-    PaymentID INT AUTO_INCREMENT PRIMARY KEY,
-    BookingID INT NOT NULL,
-    Amount DECIMAL(10, 2) NOT NULL,
-    PaymentStatus ENUM('Pending', 'Completed') DEFAULT 'Pending',
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE CASCADE
+-- Messages Table
+CREATE TABLE IF NOT EXISTS Messages (
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    message_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Create Reviews table
-CREATE TABLE Reviews (
-    ReviewID INT AUTO_INCREMENT PRIMARY KEY,
-    BookingID INT NOT NULL,
-    ReviewerID INT NOT NULL,
-    RevieweeID INT NOT NULL,
-    Rating INT CHECK (Rating BETWEEN 1 AND 5),
-    Comment TEXT,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE CASCADE,
-    FOREIGN KEY (ReviewerID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (RevieweeID) REFERENCES Users(UserID) ON DELETE CASCADE
+-- Reviews Table
+CREATE TABLE IF NOT EXISTS Reviews (
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT NOT NULL,
+    reviewer_id INT NOT NULL,
+    reviewee_id INT NOT NULL,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    review_text TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (booking_id) REFERENCES Bookings(booking_id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewer_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewee_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Create Messages table
-CREATE TABLE Messages (
-    MessageID INT AUTO_INCREMENT PRIMARY KEY,
-    SenderID INT NOT NULL,
-    ReceiverID INT NOT NULL,
-    Message TEXT NOT NULL,
-    SentAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (SenderID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (ReceiverID) REFERENCES Users(UserID) ON DELETE CASCADE
+-- Rental History Table
+CREATE TABLE IF NOT EXISTS RentalHistory (
+    rental_history_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    booking_id INT NOT NULL,
+    role ENUM('owner', 'renter') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (booking_id) REFERENCES Bookings(booking_id) ON DELETE CASCADE
 );
+
+-- Availability Table (Optional, if not using JSON in Cars table)
+CREATE TABLE IF NOT EXISTS Availability (
+    availability_id INT AUTO_INCREMENT PRIMARY KEY,
+    car_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE
+);
+
+-- Indexes for better performance
+CREATE INDEX idx_users_email ON Users(email);
+CREATE INDEX idx_cars_owner_id ON Cars(owner_id);
+CREATE INDEX idx_bookings_car_id ON Bookings(car_id);
+CREATE INDEX idx_bookings_renter_id ON Bookings(renter_id);
+CREATE INDEX idx_payments_booking_id ON Payments(booking_id);
+CREATE INDEX idx_messages_sender_id ON Messages(sender_id);
+CREATE INDEX idx_messages_receiver_id ON Messages(receiver_id);
+CREATE INDEX idx_reviews_booking_id ON Reviews(booking_id);
+CREATE INDEX idx_rental_history_user_id ON RentalHistory(user_id);
+CREATE INDEX idx_rental_history_booking_id ON RentalHistory(booking_id);
+CREATE INDEX idx_availability_car_id ON Availability(car_id);

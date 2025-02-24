@@ -4,10 +4,10 @@ import "../styles/Home.css";
 
 function Home() {
   const recentReviews = [
-    { id: 1, user: "Reem M.", comment: "Great experience! The car was clean and smooth to drive.", rating: 5 },
-    { id: 2, user: "Mariam I.", comment: "Super easy booking process. Will use again!", rating: 4 },
-    { id: 3, user: "Sabreen M.", comment: "Owner was very responsive. Car was in great condition.", rating: 5 },
-    { id: 3, user: "Doaa M.", comment: "Had a great experience on here. Highly recommend!", rating: 5 }
+    { id: 1, user: "Bob M.", comment: "Great experience! The car was clean and smooth to drive.", rating: 5 },
+    { id: 2, user: "Mark I.", comment: "Super easy booking process. Will use again!", rating: 4 },
+    { id: 3, user: "Jessica M.", comment: "Owner was very responsive. Car was in great condition.", rating: 5 },
+    { id: 3, user: "Ashley M.", comment: "Had a great experience on here. Highly recommend!", rating: 5 }
   ];
 
   return (

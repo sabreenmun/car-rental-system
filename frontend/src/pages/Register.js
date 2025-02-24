@@ -1,161 +1,178 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { Link } from 'react-router-dom';
 import "../styles/Register.css";
-import { NavLink } from 'react-router-dom';
 
 function Register() {
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [userType, setUserType] = useState('Owner'); // Default to 'Owner', can be 'Renter' or 'Both'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [securityQuestion1, setSecurityQuestion1] = useState('');
+  const [answer1, setAnswer1] = useState('');
+  const [securityQuestion2, setSecurityQuestion2] = useState('');
+  const [answer2, setAnswer2] = useState('');
+  const [securityQuestion3, setSecurityQuestion3] = useState('');
+  const [answer3, setAnswer3] = useState('');
+  const [user_type, setUserType] = useState('');
 
-    // State for security answers
-    const [answer1, setAnswer1] = useState('');
-    const [answer2, setAnswer2] = useState('');
-    const [answer3, setAnswer3] = useState('');
-    
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  // Define the available security questions
+  const securityQuestions = [
+    "What is your mother's maiden name?",
+    "What was the name of your first pet?",
+    "What was the name of your elementary school?",
+  ];
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-        // Collecting user data along with security answers
-        const userData = {
-            firstName,
-            lastName,
-            email,
-            password,
-            userType,
-            securityAnswer1: answer1,
-            securityAnswer2: answer2,
-            securityAnswer3: answer3
-        };
+    // Basic validation
+    if (!email || !password || !securityQuestion1 || !answer1 || !securityQuestion2 || !answer2 || !securityQuestion3 || !answer3) {
+      alert('Please fill out all fields.');
+      return;
+    }
 
-        try {
-            const response = await axios.post('http://localhost:5000/register', userData);
-            navigate('/login');
-        } catch (error) {
-            setError('Error registering user. Please try again.');
-        }
+    const formData = {
+      email,
+      password,
+      securityQuestion1,
+      answer1,
+      securityQuestion2,
+      answer2,
+      securityQuestion3,
+      answer3,
+      user_type,
     };
 
-    return (
-        <div className="register-page">
-            <form className="form" id="register" onSubmit={handleRegister}>
-                <h1 className="form-title">Register</h1>
+    // For now, log the form data to the console
+    console.log('Form submitted:', formData);
 
-                {/* First Name input */}
-                <label>
-                    <input
-                        type="text"
-                        placeholder="First Name"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                    />
-                </label>
-                <br />
+    // Optionally, store it in localStorage or handle the form data as needed
+    localStorage.setItem('userData', JSON.stringify(formData));
 
-                {/* Last Name input */}
-                <label>
-                    <input
-                        type="text"
-                        placeholder="Last Name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                    />
-                </label>
-                <br />
+    // Reset form fields after submission
+    setEmail('');
+    setPassword('');
+    setSecurityQuestion1('');
+    setAnswer1('');
+    setSecurityQuestion2('');
+    setAnswer2('');
+    setSecurityQuestion3('');
+    setAnswer3('');
+    setUserType('');
+  };
 
-                {/* Email input */}
-                <label>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </label>
-                <br />
-
-                {/* Password input */}
-                <label>
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </label>
-                <br />
-
-                {/* User Type selection */}
-                <label>
-                    <select
-                        value={userType}
-                        onChange={(e) => setUserType(e.target.value)}
-                        required
-                    >
-                        <option value="Owner">Owner</option>
-                        <option value="Renter">Renter</option>
-                        <option value="Both">Both</option>
-                    </select>
-                </label>
-                <br />
-
-                {/* Security Question 1 */}
-                <label>What was the name of your first pet?</label>
-                <input
-                    type="text"
-                    value={answer1}
-                    onChange={(e) => setAnswer1(e.target.value)}
-                    required
-                />
-                <br />
-
-                {/* Security Question 2 */}
-                <label>What is your mother's maiden name?</label>
-                <input
-                    type="text"
-                    value={answer2}
-                    onChange={(e) => setAnswer2(e.target.value)}
-                    required
-                />
-                <br />
-
-                {/* Security Question 3 */}
-                <label>What is the name of the city you were born in?</label>
-                <input
-                    type="text"
-                    value={answer3}
-                    onChange={(e) => setAnswer3(e.target.value)}
-                    required
-                />
-                <br />
-
-                {/* Submit button */}
-                <button type="submit">Register</button>
-
-                {/* Display error message */}
-                {error && (
-                    <div className="error-message">
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                {/* Link to login page */}
-               
-
-                <NavLink to="/login">Already have an account? Login</NavLink>
-            </form>
+  return (
+    <div className="register-page">
+      <h2>Register</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
-    );
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <label>User Type:</label>
+          <select
+            value={user_type}
+            onChange={(e) => setUserType(e.target.value)}
+            required
+          >
+            <option value="">Select User Type</option>
+            <option value="Owner">Car Owner</option>
+            <option value="Renter">Car Renter</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Security Question 1:</label>
+          <select
+            value={securityQuestion1}
+            onChange={(e) => setSecurityQuestion1(e.target.value)}
+            required
+          >
+            <option value="">Select a question</option>
+            {securityQuestions.map((question, index) => (
+              <option key={index} value={question}>
+                {question}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Answer"
+            value={answer1}
+            onChange={(e) => setAnswer1(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <label>Security Question 2:</label>
+          <select
+            value={securityQuestion2}
+            onChange={(e) => setSecurityQuestion2(e.target.value)}
+            required
+          >
+            <option value="">Select a question</option>
+            {securityQuestions.map((question, index) => (
+              <option key={index} value={question}>
+                {question}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Answer"
+            value={answer2}
+            onChange={(e) => setAnswer2(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <label>Security Question 3:</label>
+          <select
+            value={securityQuestion3}
+            onChange={(e) => setSecurityQuestion3(e.target.value)}
+            required
+          >
+            <option value="">Select a question</option>
+            {securityQuestions.map((question, index) => (
+              <option key={index} value={question}>
+                {question}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Answer"
+            value={answer3}
+            onChange={(e) => setAnswer3(e.target.value)}
+            required
+          />
+        </div>
+
+        <button type="submit">Register</button>
+      </form>
+
+      <p>
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
+    </div>
+  );
 }
 
 export default Register;
