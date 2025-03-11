@@ -1,64 +1,90 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios"; // Import axios for making API requests
 import "../styles/Register.css";
 
 function Register() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [securityQuestion1, setSecurityQuestion1] = useState('');
-  const [answer1, setAnswer1] = useState('');
-  const [securityQuestion2, setSecurityQuestion2] = useState('');
-  const [answer2, setAnswer2] = useState('');
-  const [securityQuestion3, setSecurityQuestion3] = useState('');
-  const [answer3, setAnswer3] = useState('');
-  const [user_type, setUserType] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [security_question_1, setSecurityQuestion1] = useState("");
+  const [security_answer_1, setAnswer1] = useState("");
+  const [security_question_2, setSecurityQuestion2] = useState("");
+  const [security_answer_2, setAnswer2] = useState("");
+  const [security_question_3, setSecurityQuestion3] = useState("");
+  const [security_answer_3, setAnswer3] = useState("");
+  const [user_type, setUserType] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate(); // Use navigate for redirection
 
-  // Define the available security questions
   const securityQuestions = [
     "What is your mother's maiden name?",
     "What was the name of your first pet?",
     "What was the name of your elementary school?",
   ];
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Basic validation
-    if (!email || !password || !securityQuestion1 || !answer1 || !securityQuestion2 || !answer2 || !securityQuestion3 || !answer3) {
-      alert('Please fill out all fields.');
+    if (
+      !email ||
+      !password ||
+      !security_question_1 ||
+      !security_answer_1 ||
+      !security_question_2 ||
+      !security_answer_2 ||
+      !security_question_3 ||
+      !security_answer_3
+    ) {
+      alert("Please fill out all fields.");
       return;
     }
-
+  
     const formData = {
       email,
       password,
-      securityQuestion1,
-      answer1,
-      securityQuestion2,
-      answer2,
-      securityQuestion3,
-      answer3,
+      security_question_1,
+      security_answer_1,
+      security_question_2,
+      security_answer_2,
+      security_question_3,
+      security_answer_3,
       user_type,
     };
-
-    // For now, log the form data to the console
-    console.log('Form submitted:', formData);
-
-    // Optionally, store it in localStorage or handle the form data as needed
-    localStorage.setItem('userData', JSON.stringify(formData));
-
+  
+    try {
+      // Make a POST request to the backend to register the user
+      console.log('Form Data:', formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        formData
+      );
+  
+      // Check if the registration was successful
+      if (response.status === 201) {
+        alert("User registered successfully");
+        // Redirect to login page after successful registration
+        navigate("/login");
+      } else {
+        setErrorMessage("Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setErrorMessage("Error registering user. Please try again later.");
+    }
+  
     // Reset form fields after submission
-    setEmail('');
-    setPassword('');
-    setSecurityQuestion1('');
-    setAnswer1('');
-    setSecurityQuestion2('');
-    setAnswer2('');
-    setSecurityQuestion3('');
-    setAnswer3('');
-    setUserType('');
+    setEmail("");
+    setPassword("");
+    setSecurityQuestion1("");
+    setAnswer1("");
+    setSecurityQuestion2("");
+    setAnswer2("");
+    setSecurityQuestion3("");
+    setAnswer3("");
+    setUserType("");
   };
+  
 
   return (
     <div className="register-page">
@@ -99,7 +125,7 @@ function Register() {
         <div>
           <label>Security Question 1:</label>
           <select
-            value={securityQuestion1}
+            value={security_question_1}
             onChange={(e) => setSecurityQuestion1(e.target.value)}
             required
           >
@@ -113,7 +139,7 @@ function Register() {
           <input
             type="text"
             placeholder="Answer"
-            value={answer1}
+            value={security_answer_1}
             onChange={(e) => setAnswer1(e.target.value)}
             required
           />
@@ -122,7 +148,7 @@ function Register() {
         <div>
           <label>Security Question 2:</label>
           <select
-            value={securityQuestion2}
+            value={security_question_2}
             onChange={(e) => setSecurityQuestion2(e.target.value)}
             required
           >
@@ -136,7 +162,7 @@ function Register() {
           <input
             type="text"
             placeholder="Answer"
-            value={answer2}
+            value={security_answer_2}
             onChange={(e) => setAnswer2(e.target.value)}
             required
           />
@@ -145,7 +171,7 @@ function Register() {
         <div>
           <label>Security Question 3:</label>
           <select
-            value={securityQuestion3}
+            value={security_question_3}
             onChange={(e) => setSecurityQuestion3(e.target.value)}
             required
           >
@@ -159,7 +185,7 @@ function Register() {
           <input
             type="text"
             placeholder="Answer"
-            value={answer3}
+            value={security_answer_3}
             onChange={(e) => setAnswer3(e.target.value)}
             required
           />
@@ -167,6 +193,8 @@ function Register() {
 
         <button type="submit">Register</button>
       </form>
+
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
 
       <p>
         Already have an account? <Link to="/login">Login</Link>

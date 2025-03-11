@@ -1,45 +1,47 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // useNavigate for redirecting
 import "../styles/Login.css";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');  // To store any error message
+  const navigate = useNavigate();  // To navigate to other pages
 
-  const navigate = useNavigate();
-
-  const handleLogin = async (e) => {
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Call your backend login API (this is an example, update with actual API request)
     try {
-      // Clear previous error messages
-      setErrorMessage("");
-
-      // Send login request to server
-      const response = await axios.post("http://localhost:3000/login", {
-        email,
-        password,
+      // Replace with actual backend login logic
+      const response = await fetch('http://localhost:5000/api/auth/login', {  // Make sure to use the correct URL here
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      // If login is successful, redirect to Dashboard
-      if (response.status === 200) {
-        navigate("/dashboard");
+      const data = await response.json();
+
+      if (response.ok) {
+        // On success, store user data or token in localStorage
+        // Store the token or any other required data in localStorage
+        localStorage.setItem('token', data.token);  // Store JWT token (or user data) in localStorage
+        navigate('/dashboard');  // Redirect to homepage/dashboard
+      } else {
+        setErrorMessage(data.message || 'Login failed. Please try again.');  // Show error message
       }
     } catch (error) {
-      console.error("Error:", error);
-
-      // If login failed, display error message
-      setErrorMessage("Your Email and Password are incorrect.");
+      setErrorMessage('Something went wrong. Please try again later.');
     }
   };
 
   return (
     <div className="login-page">
-      <form className="form" id="login" onSubmit={handleLogin}>
-        <h1 className="form-title">Login</h1>
-
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
         {/* Email input */}
         <label>
           <input
