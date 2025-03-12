@@ -16,6 +16,6 @@ app.get("/test", (req, res) => {
 });
 // Use auth routes
 app.use("/api/auth", authRoutes);
-app.use("/api/cars", carRoutes);
+app.use("/api", carRoutes);
 
 module.exports = app;

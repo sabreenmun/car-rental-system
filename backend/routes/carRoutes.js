@@ -1,28 +1,24 @@
 // carRoutes.js
-const express = require('express');
-const carController = require('../controllers/carController');
+const express = require("express");
+const carController = require("../controllers/carController");
 const router = express.Router();
 
-// Log to check if the router is being hit
-router.use((req, res, next) => {
-  console.log(`Request method: ${req.method}, Route: ${req.originalUrl}`);
-  next();
-});
+// Route to create a new car listing
+router.post("/cars", carController.createCar);
 
-// Create a new car listing
-router.post('/', carController.createCar);
+// Route to search cars based on query parameters
+router.get("/cars/search", carController.searchCars); // Correct route for search
 
-// Get a car by ID
-router.get('/:car_id', carController.getCarById);
-//get all cars
-router.get('/cars', carController.getAllCars);
-// Update a car's details
-router.put('/:car_id', carController.updateCar);
+// Route to fetch car by ID
+router.get("/cars/:car_id", carController.getCarById);
 
-// Delete a car listing
-router.delete('/:car_id', carController.deleteCar);
+// Route to get all cars
+router.get("/cars", carController.getAllCars);
 
-// GET /cars/search for searching cars based on filters
-router.get('/search', carController.searchCars);
+// Route to update car details
+router.put("/cars/:car_id", carController.updateCar);
+
+// Route to delete a car listing
+router.delete("/cars/:car_id", carController.deleteCar);
 
 module.exports = router;

@@ -1,12 +1,20 @@
 // carController.js
-const Car = require('../models/Car');  // Import Car model
-
+const Car = require("../models/Car"); // Import Car model
+const db = require("../config/db");
 // Create a new car listing
 exports.createCar = async (req, res) => {
-  const { owner_id, car_model, car_year, mileage, pickup_location, rental_price_per_day, availability_calendar } = req.body;
+  const {
+    owner_id,
+    car_model,
+    car_year,
+    mileage,
+    pickup_location,
+    rental_price_per_day,
+    availability_calendar,
+  } = req.body;
 
   if (!car_model || !rental_price_per_day) {
-    return res.status(400).json({ message: 'Missing required fields' });
+    return res.status(400).json({ message: "Missing required fields" });
   }
 
   const newCar = {
@@ -23,55 +31,73 @@ exports.createCar = async (req, res) => {
     // Insert car into the database
     Car.create(newCar, (err, result) => {
       if (err) {
-        console.error('Error inserting car into the database:', err);
-        return res.status(500).json({ message: 'Error creating car listing', error: err });
+        console.error("Error inserting car into the database:", err);
+        return res
+          .status(500)
+          .json({ message: "Error creating car listing", error: err });
       }
-      res.status(201).json({ message: 'Car listing created successfully', car: result });
+      res
+        .status(201)
+        .json({ message: "Car listing created successfully", car: result });
     });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ message: 'Error creating car listing', error });
+    console.error("Error:", error);
+    res.status(500).json({ message: "Error creating car listing", error });
   }
 };
-
 
 // Get a car by ID
 exports.getCarById = (req, res) => {
   const carId = req.params.car_id;
-  console.log('Fetching car with ID:', carId); // Log the car ID to confirm it's correct
-
+  console.log("Fetching car with ID:", carId); // Log the car ID to confirm it's correct
+  console.log("Inside getCarById function");
   Car.findById(carId, (err, results) => {
     if (err) {
-      return res.status(500).json({ message: 'Error fetching car details', error: err });
+      return res
+        .status(500)
+        .json({ message: "Error fetching car details", error: err });
     }
 
     if (!results.length) {
       console.log("CAR NOT FOUND");
-      return res.status(404).json({ message: 'Car not found' });
+      return res.status(404).json({ message: "Car not found" });
     }
 
     res.status(200).json({ car: results[0] });
   });
 };
 
+// Controller Method for Handling API Request (GET /api/cars)
 exports.getAllCars = async (req, res) => {
   try {
-    const query = "SELECT c.car_id, c.car_model, c.rental_price_per_day, c.owner_id, u.email AS owner_email FROM Cars c JOIN Users u ON c.owner_id = u.user_id";
+    const query =
+      "SELECT c.car_id, c.car_model, c.rental_price_per_day, c.owner_id, u.email AS owner_email FROM Cars c JOIN Users u ON c.owner_id = u.user_id";
+
+    // Execute the query
     db.query(query, (err, results) => {
       if (err) {
         console.error("Error fetching cars from database:", err);
-        return res.status(500).json({ message: 'Error fetching cars from database', error: err });
+        return res
+          .status(500)
+          .json({ message: "Error fetching cars from database", error: err });
       }
-      console.log("Fetched cars:", results);  // Check the result in your backend logs
-      res.status(200).json(results); // Send the results as a JSON response
+
+      if (results.length === 0) {
+        return res.status(404).json({
+          message: "No cars found",
+        });
+      }
+
+      console.log("Fetched cars:", results); // Log the fetched results
+      return res.status(200).json({
+        cars: results, // Send the fetched cars data as a JSON response
+      });
     });
   } catch (error) {
     console.error("Error fetching cars:", error);
-    res.status(500).json({ message: 'Error fetching cars', error });
+    return res.status(500).json({ message: "Error fetching cars", error });
   }
 };
-
-
 
 // Update a car's details
 exports.updateCar = (req, res) => {
@@ -80,10 +106,14 @@ exports.updateCar = (req, res) => {
 
   Car.update(carId, updatedCar, (err, result) => {
     if (err) {
-      return res.status(500).json({ message: 'Error updating car details', error: err });
+      return res
+        .status(500)
+        .json({ message: "Error updating car details", error: err });
     }
 
-    res.status(200).json({ message: 'Car details updated successfully', car: updatedCar });
+    res
+      .status(200)
+      .json({ message: "Car details updated successfully", car: updatedCar });
   });
 };
 
@@ -93,26 +123,36 @@ exports.deleteCar = (req, res) => {
 
   Car.delete(carId, (err, result) => {
     if (err) {
-      return res.status(500).json({ message: 'Error deleting car listing', error: err });
+      return res
+        .status(500)
+        .json({ message: "Error deleting car listing", error: err });
     }
 
-    res.status(200).json({ message: 'Car listing deleted successfully' });
+    res.status(200).json({ message: "Car listing deleted successfully" });
   });
 };
 
-// Search cars based on filters (location, model, availability)
 exports.searchCars = (req, res) => {
-  const { model, location, date } = req.query;  // Using query params for search filters
+  // Get the search filters from the query parameters
+  const filters = {
+    car_model: req.query.model,
+    pickup_location: req.query.location,
+    date: req.query.date, // Optional filter for availability
+  };
 
-  const filters = {};
-  if (location) filters.pickup_location = location;
-  if (model) filters.car_model = model;
-  if (date) filters.date = date;
+  console.log("Filters received:", filters); // Log filters to see what is being passed
 
-  Car.search(filters, (err, results) => {
+  Car.search(filters, (err, cars) => {
     if (err) {
-      return res.status(500).json({ message: 'Error searching for cars', error: err });
+      return res
+        .status(500)
+        .json({ message: "Error searching for cars", error: err });
     }
-    res.status(200).json({ cars: results });
+
+    if (!cars || cars.length === 0) {
+      return res.status(404).json({ message: "No cars found" });
+    }
+
+    res.status(200).json({ cars });
   });
 };
