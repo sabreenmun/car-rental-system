@@ -1,6 +1,7 @@
 // carController.js
 const Car = require("../models/Car"); // Import Car model
 const db = require("../config/db");
+
 // Create a new car listing
 exports.createCar = async (req, res) => {
   const {
