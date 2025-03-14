@@ -4,10 +4,11 @@ const db = require("../config/db");
 const Car = {};
 
 // Create a new car
+// Create a new car
 Car.create = (newCar, result) => {
   const query = `
-    INSERT INTO Cars (owner_id, car_model, car_year, mileage, pickup_location, rental_price_per_day, availability_calendar)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO Cars (owner_id, car_model, car_year, mileage, pickup_location, rental_price_per_day, availability_start_date, availability_end_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const values = [
@@ -17,7 +18,8 @@ Car.create = (newCar, result) => {
     newCar.mileage,
     newCar.pickup_location,
     newCar.rental_price_per_day,
-    newCar.availability_calendar,
+    newCar.availability_start_date,
+    newCar.availability_end_date,
   ];
 
   db.query(query, values, (err, res) => {
@@ -65,13 +67,11 @@ Car.getAllCars = (result) => {
   });
 };
 
-
-
 // Update car details
 Car.update = (carId, updatedCar, result) => {
   const query = `
     UPDATE Cars
-    SET car_model = ?, car_year = ?, mileage = ?, pickup_location = ?, rental_price_per_day = ?, availability_calendar = ?
+    SET car_model = ?, car_year = ?, mileage = ?, pickup_location = ?, rental_price_per_day = ?, availability_start_date = ?, availability_end_date = ?
     WHERE car_id = ?
   `;
 
@@ -81,7 +81,8 @@ Car.update = (carId, updatedCar, result) => {
     updatedCar.mileage,
     updatedCar.pickup_location,
     updatedCar.rental_price_per_day,
-    updatedCar.availability_calendar,
+    updatedCar.availability_start_date,
+    updatedCar.availability_end_date,
     carId,
   ];
 
@@ -117,23 +118,27 @@ Car.delete = (carId, result) => {
 };
 
 // Search cars based on filters (location, model, availability)
+// Search cars based on filters (location, model, availability)
 Car.search = (filters, result) => {
   let query = "SELECT * FROM Cars WHERE 1=1";
   let values = [];
 
+  // Filter by pickup location
   if (filters.pickup_location) {
     query += " AND pickup_location LIKE ?"; // To handle case insensitivity
     values.push(`%${filters.pickup_location}%`);
   }
 
+  // Filter by car model
   if (filters.car_model) {
     query += " AND car_model LIKE ?"; // To handle case insensitivity
     values.push(`%${filters.car_model}%`);
   }
 
+  // Filter by availability date range
   if (filters.date) {
-    query += " AND availability_calendar LIKE ?"; // Assuming availability is stored as a range of dates
-    values.push(`%${filters.date}%`);
+    query += " AND ? BETWEEN availability_start_date AND availability_end_date"; // Check if the given date falls within the availability range
+    values.push(filters.date); // Assuming `filters.date` is a date in 'YYYY-MM-DD' format
   }
 
   console.log("Executing query:", query);
@@ -146,22 +151,10 @@ Car.search = (filters, result) => {
       return;
     }
 
-    // Debugging: Log raw response from database
-    console.log("Raw DB response:", res);
+    // Optionally, you can process the response here before sending it back
+    // For example, filtering or formatting the response if needed
 
-    // Clean up the availability_calendar field (remove extra quotes)
-    const cleanedCars = res.map((car) => {
-      if (car.availability_calendar) {
-        // Log availability_calendar before replacing
-        console.log("Before replacing quotes:", car.availability_calendar);
-        car.availability_calendar = car.availability_calendar.replace(/"/g, "");
-        // Log after replacement
-        console.log("After replacing quotes:", car.availability_calendar);
-      }
-      return car;
-    });
-
-    result(null, cleanedCars);
+    result(null, res);
   });
 };
 

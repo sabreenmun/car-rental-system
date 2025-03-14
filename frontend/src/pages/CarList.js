@@ -1,68 +1,48 @@
-import { Link } from "react-router-dom";
-import "../styles/CarList.css";
-import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 function CarList() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Fetch cars data from the backend when the component mounts
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        // Make API request to fetch cars
-        const response = await axios.get("http://localhost:5000/api/cars");
-        setCars(response.data); // Update state with the fetched cars
-        setLoading(false); // Set loading to false after data is fetched
+        const response = await fetch("http://localhost:5000/api/cars"); // Backend API endpoint
+        const data = await response.json();
+        setCars(data); // Update the state with car listings
+        setLoading(false);
       } catch (error) {
-        setError("Failed to fetch cars"); // Set error if the request fails
-        setLoading(false); // Set loading to false even if there is an error
+        console.error("Error fetching car listings", error);
+        setLoading(false);
       }
     };
 
-    fetchCars(); // Call the function to fetch cars
-  }, []); // Empty array means this effect runs only once when the component mounts
+    fetchCars();
+  }, []);
 
   if (loading) {
-    return <div>Loading cars...</div>; // Show loading message while data is being fetched
-  }
-
-  if (error) {
-    return <div>{error}</div>; // Show error message if something went wrong
+    return <div>Loading...</div>;
   }
 
   return (
-    <div className="car-list-page">
-      {/* Title Section */}
-      <div className="car-list-header">
-        <h1>Browse Available Cars</h1>
-        <p>
-          Find the perfect car for your next adventure. Rent from local owners
-          today!
-        </p>
-      </div>
-
-      {/* Cars List */}
-      <div className="car-list">
-        {cars.map((car) => (
-          <div key={car.car_id} className="car-item">
-            {" "}
-            {/* Use car_id instead of id */}
-            <div className="car-info">
-              <h3>{car.car_model}</h3> {/* Use car_model from backend */}
-              <p>Owner: {car.owner}</p> {/* Use owner email from backend */}
-              <p>Price: ${car.rental_price_per_day}/day</p>{" "}
-              {/* Use rental_price_per_day */}
-              <Link to={`/car/${car.car_id}`} className="btn">
-                Rent Now
-              </Link>{" "}
-              {/* Use car_id */}
-            </div>
+    <div className="car-listings">
+      {cars.length === 0 ? (
+        <p>No cars available for rent at the moment.</p>
+      ) : (
+        cars.map((car) => (
+          <div className="car-card" key={car.id}>
+            <img src={car.imageUrl} alt={car.model} />
+            <h3>{car.model}</h3>
+            <p>Year: {car.year}</p>
+            <p>Mileage: {car.mileage} miles</p>
+            <p>Price per day: ${car.rental_price_per_day}</p>
+            <Link to={`/car-details/${car.id}`} className="btn-details">
+              View Details
+            </Link>
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
   );
 }

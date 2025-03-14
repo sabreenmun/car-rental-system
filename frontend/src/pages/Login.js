@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // useNavigate for redirecting
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // useNavigate for redirecting
 import "../styles/Login.css";
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');  // To store any error message
-  const navigate = useNavigate();  // To navigate to other pages
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // To store any error message
+  const navigate = useNavigate(); // To navigate to other pages
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -15,10 +15,11 @@ function Login() {
     // Call your backend login API (this is an example, update with actual API request)
     try {
       // Replace with actual backend login logic
-      const response = await fetch('http://localhost:5000/api/auth/login', {  // Make sure to use the correct URL here
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        // Make sure to use the correct URL here
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -27,14 +28,21 @@ function Login() {
 
       if (response.ok) {
         // On success, store user data or token in localStorage
-        // Store the token or any other required data in localStorage
-        localStorage.setItem('token', data.token);  // Store JWT token (or user data) in localStorage
-        navigate('/dashboard');  // Redirect to homepage/dashboard
+        // Store the token and user role in localStorage
+        localStorage.setItem("token", data.token); // Store JWT token (or user data) in localStorage
+        localStorage.setItem("user_role", data.user_role); // Store the user role in localStorage
+
+        // Redirect to the appropriate page based on user role
+        if (data.user_role === "Renter") {
+          navigate("/renter-dashboard"); // Redirect to the Renter Dashboard
+        } else if (data.user_role === "Owner") {
+          navigate("/owner-dashboard"); // Redirect to the Owner Dashboard
+        }
       } else {
-        setErrorMessage(data.message || 'Login failed. Please try again.');  // Show error message
+        setErrorMessage(data.message || "Login failed. Please try again."); // Show error message
       }
     } catch (error) {
-      setErrorMessage('Something went wrong. Please try again later.');
+      setErrorMessage("Something went wrong. Please try again later.");
     }
   };
 

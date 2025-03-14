@@ -7,15 +7,11 @@ const Payment = {};
 
 // Create a new payment
 Payment.create = (paymentData, result) => {
-  const query = `INSERT INTO payments (booking_id, amount, payment_status, payment_date) VALUES (?, ?, ?, ?)`;
+  const query = `INSERT INTO payments (booking_id, amount, payment_status) VALUES (?, ?, ?)`; // Removed payment_date
+
   db.query(
     query,
-    [
-      paymentData.booking_id,
-      paymentData.amount,
-      paymentData.payment_status,
-      paymentData.payment_date,
-    ],
+    [paymentData.booking_id, paymentData.amount, paymentData.payment_status],
     (err, res) => {
       if (err) {
         console.error("Error inserting payment:", err);
@@ -26,6 +22,8 @@ Payment.create = (paymentData, result) => {
     }
   );
 };
+
+module.exports = Payment;
 
 // Find payment by booking ID
 Payment.findByBookingId = (booking_id, result) => {

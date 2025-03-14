@@ -1,15 +1,25 @@
 // controllers/authController.js
-const User = require('../models/User');
-const { hashPassword, verifyPassword } = require('../utils/encryption');
-const jwt = require('jsonwebtoken');
+const User = require("../models/User");
+const { hashPassword, verifyPassword } = require("../utils/encryption");
+const jwt = require("jsonwebtoken");
 
 // Register a new user
 exports.register = (req, res) => {
-    const { email, password, security_question_1, security_answer_1, security_question_2, security_answer_2, security_question_3, security_answer_3, user_type } = req.body;
+  const {
+    email,
+    password,
+    security_question_1,
+    security_answer_1,
+    security_question_2,
+    security_answer_2,
+    security_question_3,
+    security_answer_3,
+    user_type,
+  } = req.body;
 
-   console.log('Registering new user with data:', req.body);
-   if (!user_type) {
-    return res.status(400).json({ error: 'user_type is required' });
+  console.log("Registering new user with data:", req.body);
+  if (!user_type) {
+    return res.status(400).json({ error: "user_type is required" });
   }
   // Hash the password
   const password_hash = hashPassword(password);
@@ -23,17 +33,18 @@ exports.register = (req, res) => {
     security_answer_2,
     security_question_3,
     security_answer_3,
-    user_type
+    user_type,
   };
 
-  console.log('New user data:', newUser); 
-
+  console.log("New user data:", newUser);
 
   User.create(newUser, (err, results) => {
     if (err) {
-      return res.status(500).json({ error: 'Error registering user', details: err });
+      return res
+        .status(500)
+        .json({ error: "Error registering user", details: err });
     }
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: "User registered successfully" });
   });
 };
 
@@ -43,16 +54,20 @@ exports.login = (req, res) => {
 
   User.findByEmail(email, (err, results) => {
     if (err || results.length === 0) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     const user = results[0];
     if (verifyPassword(password, user.password_hash)) {
       // Generate a JWT token
-      const token = jwt.sign({ userId: user.user_id, email: user.email }, 'your-secret-key', { expiresIn: '1h' });
-      res.status(200).json({ message: 'Login successful', token });
+      const token = jwt.sign(
+        { userId: user.user_id, email: user.email },
+        "your-secret-key",
+        { expiresIn: "1h" }
+      );
+      res.status(200).json({ message: "Login successful", token });
     } else {
-      res.status(401).json({ error: 'Invalid email or password' });
+      res.status(401).json({ error: "Invalid email or password" });
     }
   });
 };
@@ -63,7 +78,7 @@ exports.forgotPassword = (req, res) => {
 
   User.findByEmail(email, (err, results) => {
     if (err || results.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const user = results[0];
@@ -73,9 +88,13 @@ exports.forgotPassword = (req, res) => {
       security_answers.question3 === user.security_answer_3;
 
     if (isAnswersCorrect) {
-      res.status(200).json({ message: 'Security questions answered correctly', email });
+      res
+        .status(200)
+        .json({ message: "Security questions answered correctly", email });
     } else {
-      res.status(400).json({ error: 'Incorrect answers to security questions' });
+      res
+        .status(400)
+        .json({ error: "Incorrect answers to security questions" });
     }
   });
 };
@@ -89,8 +108,10 @@ exports.resetPassword = (req, res) => {
 
   User.updatePassword(email, newPasswordHash, (err, results) => {
     if (err) {
-      return res.status(500).json({ error: 'Error resetting password', details: err });
+      return res
+        .status(500)
+        .json({ error: "Error resetting password", details: err });
     }
-    res.status(200).json({ message: 'Password reset successfully' });
+    res.status(200).json({ message: "Password reset successfully" });
   });
 };

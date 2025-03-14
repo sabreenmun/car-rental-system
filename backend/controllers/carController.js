@@ -2,7 +2,6 @@
 const Car = require("../models/Car"); // Import Car model
 const db = require("../config/db");
 
-// Create a new car listing
 exports.createCar = async (req, res) => {
   const {
     owner_id,
@@ -11,11 +10,24 @@ exports.createCar = async (req, res) => {
     mileage,
     pickup_location,
     rental_price_per_day,
-    availability_calendar,
+    availability_start_date,
+    availability_end_date,
   } = req.body;
 
-  if (!car_model || !rental_price_per_day) {
-    return res.status(400).json({ message: "Missing required fields" });
+  // Ensure all required fields are provided
+  if (
+    !car_model ||
+    !car_year ||
+    !mileage ||
+    !pickup_location ||
+    !rental_price_per_day ||
+    !availability_start_date ||
+    !availability_end_date
+  ) {
+    return res.status(400).json({
+      message:
+        "All fields are required: car_model, car_year, mileage, pickup_location, rental_price_per_day, availability_start_date, availability_end_date",
+    });
   }
 
   const newCar = {
@@ -25,7 +37,8 @@ exports.createCar = async (req, res) => {
     mileage,
     pickup_location,
     rental_price_per_day,
-    availability_calendar,
+    availability_start_date,
+    availability_end_date
   };
 
   try {
@@ -33,17 +46,21 @@ exports.createCar = async (req, res) => {
     Car.create(newCar, (err, result) => {
       if (err) {
         console.error("Error inserting car into the database:", err);
-        return res
-          .status(500)
-          .json({ message: "Error creating car listing", error: err });
+        return res.status(500).json({
+          message: "Error creating car listing",
+          error: err.message || "Database error",
+        });
       }
+
       res
         .status(201)
         .json({ message: "Car listing created successfully", car: result });
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ message: "Error creating car listing", error });
+    res
+      .status(500)
+      .json({ message: "Error creating car listing", error: error.message });
   }
 };
 

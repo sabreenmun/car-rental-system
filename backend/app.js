@@ -5,6 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const carRoutes = require("./routes/carRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 const app = express();
 
 app.use(cors());
@@ -22,4 +23,5 @@ app.use("/api/auth", authRoutes);
 app.use("/api", carRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/message", messageRoutes)
 module.exports = app;

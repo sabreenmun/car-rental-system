@@ -27,9 +27,10 @@ CREATE TABLE IF NOT EXISTS Cars (
     mileage INT NOT NULL,
     pickup_location VARCHAR(255) NOT NULL,
     rental_price_per_day DECIMAL(10, 2) NOT NULL,
-    availability_calendar JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    availability_start_date DATE NOT NULL,
+    availability_end_date DATE NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 

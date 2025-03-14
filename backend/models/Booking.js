@@ -27,7 +27,6 @@ class Booking {
     db.query(query, callback);
   }
 
-  // Get a booking by ID
   static findById(booking_id, callback) {
     const query = `
       SELECT B.*, C.car_model AS car_model, U.email AS renter_email
@@ -36,8 +35,18 @@ class Booking {
       JOIN Users U ON B.renter_id = U.user_id
       WHERE B.booking_id = ?
     `;
-    db.query(query, [booking_id], callback);
+    db.query(query, [booking_id], (err, results) => {
+      if (err) {
+        return callback(err, null);
+      }
+      if (results.length === 0) {
+        return callback(null, null); // No booking found
+      }
+      callback(null, results[0]); // ✅ Return first object instead of array
+    });
   }
+  
+  
 
   // Update booking status
   static updateStatus = (id, booking_status, result) => {
