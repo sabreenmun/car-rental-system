@@ -1,4 +1,3 @@
-// models/Booking.js
 const db = require("../config/db");
 
 class Booking {
@@ -45,8 +44,6 @@ class Booking {
       callback(null, results[0]); // ✅ Return first object instead of array
     });
   }
-  
-  
 
   // Update booking status
   static updateStatus = (id, booking_status, result) => {
@@ -65,6 +62,22 @@ class Booking {
   static delete(booking_id, callback) {
     const query = "DELETE FROM Bookings WHERE booking_id = ?";
     db.query(query, [booking_id], callback);
+  }
+
+  // Check availability for a car within the given dates
+  static checkAvailability(car_id, start_date, end_date, callback) {
+    const sql = `
+      SELECT * FROM Bookings
+      WHERE car_id = ? 
+      AND (
+        (start_date <= ? AND end_date >= ?) 
+        OR 
+        (start_date <= ? AND end_date >= ?)
+      )
+    `;
+    const values = [car_id, end_date, start_date, start_date, end_date];
+
+    db.query(sql, values, callback);
   }
 }
 

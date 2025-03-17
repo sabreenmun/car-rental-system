@@ -1,97 +1,65 @@
-import React, { useState, useEffect } from "react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
 import "../styles/Navbar.css";
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../components/AuthContext"; // Import the AuthContext
 
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(null); // Track user role
+  const { isLoggedIn, userRole, logout } = useContext(AuthContext); // Access login state and logout function
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if the user is logged in (look for the JWT token in localStorage)
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('user_role');
-    
-    if (token) {
-      setIsLoggedIn(true); // User is logged in
-      setUserRole(role);   // Set the user role if logged in
-    } else {
-      setIsLoggedIn(false); // User is not logged in
-      setUserRole(null);    // No role assigned
-    }
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token from localStorage
-    localStorage.removeItem('user_role'); // Remove user role from localStorage
-    setIsLoggedIn(false); // Update login state to false
-    setUserRole(null); // Clear the user role
-    navigate('/login'); // Redirect to login page
+    logout();
+    navigate("/");
   };
 
   return (
     <nav>
-      <Link to="/" className="title">
-        DriveShare
-      </Link>
-      <div
-        className="menu"
-        onClick={() => setMenuOpen(!menuOpen)}
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <ul className={menuOpen ? "open" : ""}>
+      <ul>
         <li>
-          <NavLink to="/home">Home</NavLink>
+          <Link to="/">Home</Link>
         </li>
         <li>
-          <NavLink to="/about">About</NavLink>
+          <Link to="/about">About</Link>
         </li>
         <li>
-          <NavLink to="/help">Help</NavLink>
-        </li>
-        <li>
-          <NavLink to="/search-cars">Search Cars</NavLink>
+          <Link to="/help">Help</Link>
         </li>
 
-        {/* Conditionally render login and register links if the user is not logged in */}
+        {isLoggedIn && userRole === "Renter" && (
+          <>
+            <li>
+              <Link to="/renter-dashboard">Renter Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/search-cars">Search Cars</Link>
+            </li>
+          </>
+        )}
+
+        {isLoggedIn && userRole === "Owner" && (
+          <>
+            <li>
+              <Link to="/owner-dashboard">Owner Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/create-listing">Create Listing</Link>
+            </li>
+          </>
+        )}
+
         {!isLoggedIn ? (
           <>
             <li>
-              <NavLink to="/login">Login</NavLink>
+              <Link to="/login">Login</Link>
             </li>
             <li>
-              <NavLink to="/register">Register</NavLink>
+              <Link to="/register">Register</Link>
             </li>
           </>
         ) : (
-          <>
-            {/* Show dashboard link based on user role */}
-            {userRole === 'Owner' && (
-              <>
-                <li>
-                  <NavLink to="/owner-dashboard">Owner Dashboard</NavLink>
-                </li>
-                <li>
-                  <NavLink to="/create-listing">Create Listing</NavLink>
-                </li>
-              </>
-            )}
-            {/* Show Renter's dashboard link */}
-            {userRole === 'Renter' && (
-              <li>
-                <NavLink to="/renter-dashboard">Renter Dashboard</NavLink>
-              </li>
-            )}
-
-            {/* Logout button */}
-            <li>
-              <button onClick={handleLogout}>Logout</button>
-            </li>
-          </>
+          <li>
+            <button onClick={handleLogout}>Logout</button>
+          </li>
         )}
       </ul>
     </nav>

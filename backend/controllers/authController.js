@@ -52,20 +52,29 @@ exports.register = (req, res) => {
 exports.login = (req, res) => {
   const { email, password } = req.body;
 
+  // Find the user by their email
   User.findByEmail(email, (err, results) => {
     if (err || results.length === 0) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const user = results[0];
+    const user = results[0]; // Get the user from the database
     if (verifyPassword(password, user.password_hash)) {
-      // Generate a JWT token
+      // User is authenticated. Now we can create the token with the user ID
+
+      // Generate a JWT token with the userId and email in the payload
       const token = jwt.sign(
-        { userId: user.user_id, email: user.email },
-        "your-secret-key",
-        { expiresIn: "1h" }
+        { userId: user.user_id, email: user.email }, // Add userId here
+        "your-secret-key", // Use a secret key to sign the token
+        { expiresIn: "1h" } // Expire in 1 hour
       );
-      res.status(200).json({ message: "Login successful", token });
+
+      // Send back the token to the client (front-end)
+      res.status(200).json({
+        message: "Login successful",
+        token, // Send the token to the frontend
+        user_role: user.role, // Optionally send the role, if needed
+      });
     } else {
       res.status(401).json({ error: "Invalid email or password" });
     }

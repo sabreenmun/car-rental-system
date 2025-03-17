@@ -38,7 +38,7 @@ exports.createCar = async (req, res) => {
     pickup_location,
     rental_price_per_day,
     availability_start_date,
-    availability_end_date
+    availability_end_date,
   };
 
   try {
@@ -88,8 +88,24 @@ exports.getCarById = (req, res) => {
 // Controller Method for Handling API Request (GET /api/cars)
 exports.getAllCars = async (req, res) => {
   try {
-    const query =
-      "SELECT c.car_id, c.car_model, c.rental_price_per_day, c.owner_id, u.email AS owner_email FROM Cars c JOIN Users u ON c.owner_id = u.user_id";
+    const { model, location, minPrice, maxPrice } = req.query; // Get query parameters
+
+    let query =
+      "SELECT c.car_id, c.car_model, c.rental_price_per_day, c.owner_id, u.email AS owner_email FROM Cars c JOIN Users u ON c.owner_id = u.user_id WHERE 1=1";
+
+    // Dynamically build the query based on provided filters
+    if (model) {
+      query += ` AND c.car_model LIKE '%${model}%'`; // Case-insensitive search
+    }
+    if (location) {
+      query += ` AND c.pickup_location LIKE '%${location}%'`; // Case-insensitive search
+    }
+    if (minPrice) {
+      query += ` AND c.rental_price_per_day >= ${minPrice}`; // Minimum price filter
+    }
+    if (maxPrice) {
+      query += ` AND c.rental_price_per_day <= ${maxPrice}`; // Maximum price filter
+    }
 
     // Execute the query
     db.query(query, (err, results) => {
@@ -102,7 +118,7 @@ exports.getAllCars = async (req, res) => {
 
       if (results.length === 0) {
         return res.status(404).json({
-          message: "No cars found",
+          message: "No cars found matching your filters",
         });
       }
 
@@ -151,16 +167,21 @@ exports.deleteCar = (req, res) => {
 };
 
 exports.searchCars = (req, res) => {
-  // Get the search filters from the query parameters
-  const filters = {
-    car_model: req.query.model,
-    pickup_location: req.query.location,
-    date: req.query.date, // Optional filter for availability
-  };
+  const { model, location, date, price } = req.query;
 
-  console.log("Filters received:", filters); // Log filters to see what is being passed
+  const filters = {};
+  if (model) filters.car_model = new RegExp(model, "i");
+  if (location) filters.pickup_location = new RegExp(location.trim(), "i"); // Trim spaces
+  if (date) {
+    const searchDate = new Date(date);
+    filters.availability_start_date = { $lte: searchDate };
+    filters.availability_end_date = { $gte: searchDate };
+  }
+  if (price) filters.rental_price_per_day = { $lte: price };
 
-  Car.search(filters, (err, cars) => {
+  console.log("Filters being used:", filters); // Debugging filters
+
+  Car.find(filters, (err, cars) => {
     if (err) {
       return res
         .status(500)

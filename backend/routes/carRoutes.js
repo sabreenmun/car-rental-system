@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/cars", carController.createCar);
 
 // Route to search cars based on query parameters
-router.get("/cars/search", carController.searchCars); // Correct route for search
+router.get("/cars/search", carController.searchCars);
 
 // Route to fetch car by ID
 router.get("/cars/:car_id", carController.getCarById);
