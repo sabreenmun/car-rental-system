@@ -1,5 +1,4 @@
 from django.contrib import messages
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -7,8 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 from .models import *
 from .forms import *
 from cars.models import Rental
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from designpatterns.cors import SecurityQuestion1Handler, SecurityQuestion2Handler, SecurityQuestion3Handler
+
 
 User = get_user_model()
 
@@ -88,7 +88,6 @@ def request_password_reset(request):
 
     return render(request, 'home/register_password_reset.html', {'form': form})
 
-
 def verify_security_questions(request):
     user_id = request.session.get('reset_user_id')
     if not user_id:
@@ -97,19 +96,34 @@ def verify_security_questions(request):
     user = get_object_or_404(User, id=user_id)
     car_owner = get_object_or_404(CarOwner, user=user)
 
+    # Create the chain of responsibility
+    handler1 = SecurityQuestion1Handler()
+    handler2 = SecurityQuestion2Handler(handler1)
+    handler3 = SecurityQuestion3Handler(handler2)
+
     if request.method == "POST":
         form = SecurityQuestionForm(request.POST)
         if form.is_valid():
-            if (car_owner.security_answer_1 == form.cleaned_data['security_answer_1'] and
-                car_owner.security_answer_2 == form.cleaned_data['security_answer_2'] and
-                car_owner.security_answer_3 == form.cleaned_data['security_answer_3']):
+            security_answer_1 = form.cleaned_data['security_answer_1']
+            security_answer_2 = form.cleaned_data['security_answer_2']
+            security_answer_3 = form.cleaned_data['security_answer_3']
+
+            # Verify answers through the chain of responsibility
+            if (handler3.handle(car_owner, security_answer_1, 1) and
+                handler3.handle(car_owner, security_answer_2, 2) and
+                handler3.handle(car_owner, security_answer_3, 3)):
+                
                 request.session['security_verified'] = True
                 return redirect('set_new_password')
+            else:
+                form.add_error(None, 'One or more answers are incorrect.')
 
     else:
         form = SecurityQuestionForm()
 
+    # Ensure a response is returned in all cases
     return render(request, 'home/verify_security_questions.html', {'form': form})
+
 
 def set_new_password(request):
     if not request.session.get('security_verified'):

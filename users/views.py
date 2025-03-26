@@ -86,12 +86,12 @@ def verify_security_questions(request):
     if request.method == "POST":
         form = SecurityQuestionForm(request.POST)
         if form.is_valid():
-            # Retrieve answers and question number from the form
+            # retrieve answers and question number from the form
             security_answer_1 = form.cleaned_data['security_answer_1']
             security_answer_2 = form.cleaned_data['security_answer_2']
             security_answer_3 = form.cleaned_data['security_answer_3']
 
-            # Verify answers through the chain of responsibility
+            # verify answers through the chain of responsibility
             if (handler3.handle(car_renter, security_answer_1, 1) and
                 handler3.handle(car_renter, security_answer_2, 2) and
                 handler3.handle(car_renter, security_answer_3, 3)):
@@ -99,7 +99,7 @@ def verify_security_questions(request):
                 request.session['security_verified'] = True
                 return redirect('car_renter_set_new_password')
             else:
-                # Optionally, you can add a message for incorrect answers
+                # optionally, you can add a message for incorrect answers
                 form.add_error(None, 'One or more answers are incorrect.')
     else:
         form = SecurityQuestionForm()

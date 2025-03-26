@@ -43,8 +43,6 @@ def car_create(request):
     return render(request, "cars/car_form.html", {"form": form})
 
 
-
-
 class CarUpdateView(LoginRequiredMixin, UpdateView):
     model = Car
     form_class = CarForm
@@ -78,8 +76,6 @@ class CarUpdateView(LoginRequiredMixin, UpdateView):
         return reverse_lazy('car_list')
 
 
-
-
 class CarDetailView(DetailView):
     model = Car
     template_name = 'cars/car_detail.html'
@@ -96,7 +92,6 @@ class CarDetailView(DetailView):
         return context 
 
 
-
 @login_required
 def car_delete(request, car_id):
     car = get_object_or_404(Car, id=car_id)
@@ -111,9 +106,8 @@ def car_delete(request, car_id):
 
     return render(request, "cars/car_confirm_delete.html", {"car": car})
 
-
 from datetime import timedelta
-from django.contrib import messages
+
 @login_required
 def book_car(request, car_id):
     car = get_object_or_404(Car, id=car_id)
@@ -159,9 +153,6 @@ def book_car(request, car_id):
 
     return render(request, "cars/book_car.html", {"form": form, "car": car})
 
-
-
-
 @login_required
 def process_payment(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
@@ -176,7 +167,7 @@ def process_payment(request, booking_id):
         payment = Payment.objects.create(
             booking=booking,
             renter=request.user,
-            amount=booking.total_price,  # 🔥 মোট বুকিংয়ের মূল্য পাঠানো হচ্ছে
+            amount=booking.total_price,
             status="completed" if success else "failed",
             transaction_id=transaction_id,
         )
@@ -219,12 +210,6 @@ def my_bookings(request):
     bookings = Booking.objects.filter(renter=request.user)
     
     return render(request, "cars/my_bookings.html", {"bookings": bookings})
-
-
-
-
-
-
 
 
 @login_required

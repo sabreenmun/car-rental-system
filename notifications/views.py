@@ -77,4 +77,3 @@ def extra(request):
     
     return render(request, 'notifications/extra.html')
 
-

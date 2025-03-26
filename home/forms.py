@@ -8,36 +8,41 @@ User = get_user_model()
 
 class CarOwnerRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
-
-   
+    
     SECURITY_QUESTIONS = [
         ("What is your mother's maiden name?", "What is your mother's maiden name?"),
-        ("what was the model of your first car?", "what was the model of your first car?"),
+        ("What was the model of your first car?", "What was the model of your first car?"),
         ("What is the name of your first pet?", "What is the name of your first pet?"),
     ]
-
-    # Hardcoded security questions
-    security_question_1 = forms.CharField(
-        initial=SECURITY_QUESTIONS[0][1],  # Set the first question as default
-        widget=forms.TextInput(attrs={'readonly': 'readonly'})  # Make it read-only
-    )
+    
+    security_question_1 = forms.CharField(initial=SECURITY_QUESTIONS[0][1], widget=forms.TextInput(attrs={'readonly': 'readonly'}))
     security_answer_1 = forms.CharField(widget=forms.PasswordInput)
-
-    security_question_2 = forms.CharField(
-        initial=SECURITY_QUESTIONS[1][1],  # Set the second question as default
-        widget=forms.TextInput(attrs={'readonly': 'readonly'})  # Make it read-only
-    )
+    security_question_2 = forms.CharField(initial=SECURITY_QUESTIONS[1][1], widget=forms.TextInput(attrs={'readonly': 'readonly'}))
     security_answer_2 = forms.CharField(widget=forms.PasswordInput)
-
-    security_question_3 = forms.CharField(
-        initial=SECURITY_QUESTIONS[2][1],  
-        widget=forms.TextInput(attrs={'readonly': 'readonly'})  
-    )
+    security_question_3 = forms.CharField(initial=SECURITY_QUESTIONS[2][1], widget=forms.TextInput(attrs={'readonly': 'readonly'}))
     security_answer_3 = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         model = User  
         fields = ['username', 'email', 'password']
+
+def save(self, commit=True):
+    user = super().save(commit=False)
+    user.set_password(self.cleaned_data['password'])
+    if commit:
+        user.save()
+    # Save the security questions and answers
+    car_renter = CarOwner(  
+        user=user,
+        security_question_1=self.cleaned_data['security_question_1'],
+        security_answer_1=self.cleaned_data['security_answer_1'],
+        security_question_2=self.cleaned_data['security_question_2'],
+        security_answer_2=self.cleaned_data['security_answer_2'],
+        security_question_3=self.cleaned_data['security_question_3'],
+        security_answer_3=self.cleaned_data['security_answer_3']
+    )
+    car_renter.save()
+    return user
 
 class CarOwnerLoginForm(forms.Form):
     username = forms.CharField()
@@ -45,8 +50,6 @@ class CarOwnerLoginForm(forms.Form):
 
 class PasswordResetForm(forms.Form):
     username = forms.CharField()
-
-from django import forms
 
 class SecurityQuestionForm(forms.Form):
     security_answer_1 = forms.CharField(
@@ -66,8 +69,6 @@ class SetNewPasswordForm(forms.Form):
     new_password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
 
-
-from django import forms
 
 class LoginChoiceForm(forms.Form):
     USER_CHOICES = [

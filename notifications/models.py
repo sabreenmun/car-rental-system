@@ -1,6 +1,7 @@
 from django.db import models
 from cars.models import Car
 from django.conf import settings
+from cars.models import Booking
 
 class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
@@ -12,15 +13,9 @@ class Notification(models.Model):
         return f"Notification for {self.user.username} - {self.message[:20]}"
 
 
-# models.py
-from django.db import models
-from django.conf import settings
-
-from django.db import models
-from django.conf import settings
 
 class Review(models.Model):
-    car = models.ForeignKey("cars.Car", on_delete=models.CASCADE, related_name="reviews")  # Car being reviewed
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)  # No default datetime
     reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="given_reviews")
     reviewed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="received_reviews")
     rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], default=5)
@@ -28,9 +23,8 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("reviewer", "car")  # A user can review a car only once
+        unique_together = ("reviewer", "booking")  # Ensures a user can review a booking only once
 
     def __str__(self):
-        return f"Review by {self.reviewer} for {self.reviewed_user} on {self.car}"
-
+        return f"Review by {self.reviewer} for {self.reviewed_user} on {self.booking.car.model}"
 

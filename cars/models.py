@@ -1,9 +1,5 @@
 from django.db import models
 from django.conf import settings
-
-
-from django.db import models
-from django.conf import settings
 from datetime import datetime, timedelta
 
 class Car(models.Model):
@@ -53,8 +49,6 @@ class Booking(models.Model):
 
 
 
-
-
 class Payment(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name="payment")
     renter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -81,8 +75,6 @@ class CarBooking(models.Model):
     end_date = models.DateField()
     status = models.CharField(max_length=100, choices=[('booked', 'Booked'), ('completed', 'Completed')])
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-
-
 
 
 class Rental(models.Model):
