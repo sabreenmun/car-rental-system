@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - DriveShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: #f1f1f1;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .header {
+            background-color: #a0722d;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;  
+            font-size: 3rem;   
+            margin-bottom: 30px; 
+        }
+
+
+        .header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .header .nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header .nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .header .nav a:hover {
+            color: #ffc107;
+            transform: scale(1.1);
+        }
+
+        .container {
+            flex-grow: 1;
+            padding: 30px;
+        }
+
+        .container h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #343a40;
+        }
+        .btn-primary, .btn-secondary {
+            background-color: #1888ea;
+            border-color: #1888ea;  
+        }
+
+
+        .btn-primary:hover, .btn-secondary:hover {
+                background-color: #1568b0;
+                border-color: #1568b0;
+                opacity: 0.9;   
+            }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #a0722d;
+            color: white;
+            position: relative;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .footer-spacer {
+            flex-grow: 1;
+        }
+
+        .mt-5 p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">🚗 DriveShare</div>
+        <nav class="nav">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'help' %}">Help</a>
+            <a href="{% url 'login_choice' %}" class="btn-primary">Login</a>
+            <a href="{% url 'register_choice' %}" class="secondary">Register</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>Help Section</h1>
+    </div>
+
+    <div class="container mt-5">
+        <h1>Having trouble? We're here to help.</h1>
+        <p>You can either register as a car owner to post your car for rent, or as a renter to find and rent cars. Please choose an option below:</p>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Register as a Car Owner</h5>
+                        <p>If you have a car and want to earn extra income, you can register as a car owner. List your car for others to rent!</p>
+                        <a href="{% url 'register_choice' %}" class="btn btn-primary">Start as Car Owner</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Register as a Renter</h5>
+                        <p>If you're looking to rent a car for your trips, you can register as a renter and find the perfect car for your needs.</p>
+                        <a href="{% url 'register_choice' %}" class="btn btn-secondary">Start as Renter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <p>Once you've registered, make sure to fill in the required information, and you'll be ready to start enjoying the benefits of DriveShare!</p>
+        </div>
+    </div>
+
+    <div class="footer-spacer"></div>
+    
+    <footer>
+        &copy; 2025 DriveShare. All Rights Reserved.
+    </footer>
+</body>
+</html>

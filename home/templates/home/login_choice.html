@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Choice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #343a40;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        form p {
+            margin-bottom: 0;
+        }
+
+        form label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: #555;
+            text-align: center;
+            
+        }
+
+        form select, form input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #333;
+            transition: border-color 0.3s ease;
+        }
+
+        form select:focus, form input:focus {
+            border-color: #343a40;
+            outline: none;
+        }
+
+        button {
+            background: #a0722d;
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 58, 64, 0.4);
+        }
+
+        .back-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        }
+        
+
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+
+       
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .form-check {
+            padding-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-item label {
+            margin-left: 5px;
+        }
+    </style>
+    <!-- add Poppins font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <h2>LOGIN</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.user_type.id_for_label }}">{{ form.user_type.label }}</label>
+                <div class="form-check">
+                    <!-- loop over the radio buttons -->
+                    {% for radio in form.user_type %}
+                        <div class="radio-item">
+                            <!-- rende the radio button and label inline -->
+                            {{ radio }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit">Proceed</button>
+        </form>
+        <a href="{% url 'home' %}" class="back-btn">Back to Home</a>
+    </div>
+    
+</body>
+</html>
