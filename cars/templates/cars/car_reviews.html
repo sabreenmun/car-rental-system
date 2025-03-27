@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Reviews for {{ car.model }}</h2>
+
+{% for review in reviews %}
+    <div>
+        <p><strong>{{ review.reviewer.username }}</strong> rated: {{ review.rating }}/5</p>
+        <p>Comment: {{ review.comment }}</p>
+        <small>{{ review.created_at }}</small>
+    </div>
+{% empty %}
+    <p>No reviews yet.</p>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Car - DriveShare</title>
+    <!-- Bootstrap CSS -->
+   
+    <style>
+    /* Basic Reset */
+    * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        /* Form Container Styling */
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Title Styling */
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Form Group Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group .form-control-file {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Button Styling */
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            text-align: center;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #495057;
+        }
+
+        /* Centering the buttons */
+        .form-group.text-center {
+            text-align: center;
+        }
+
+        /* Add some spacing between the buttons */
+        .form-group.text-center .btn {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Add a New Car</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Model Field -->
+            <div class="form-group">
+                <label for="id_model">Model</label>
+                <input type="text" name="model" id="id_model" class="form-control" required>
+            </div>
+        
+            <!-- Year Field -->
+            <div class="form-group">
+                <label for="id_year">Year</label>
+                <input type="number" name="year" id="id_year" class="form-control" required>
+            </div>
+        
+            <!-- Mileage Field -->
+            <div class="form-group">
+                <label for="id_mileage">Mileage</label>
+                <input type="number" name="mileage" id="id_mileage" class="form-control" required>
+            </div>
+        
+            <!-- Availability Field -->
+            <div class="form-group">
+                <label for="id_availability">Availability</label>
+                <select name="availability" id="id_availability" class="form-control" required>
+                    <option value="True">Available</option>
+                    <option value="False">Not Available</option>
+                </select>
+            </div>
+        
+            <!-- Pickup Location Field -->
+            <div class="form-group">
+                <label for="id_pickup_location">Pickup Location</label>
+                <input type="text" name="pickup_location" id="id_pickup_location" class="form-control" required>
+            </div>
+        
+            <!-- Rental Price Field -->
+            <div class="form-group">
+                <label for="id_rental_price">Rental Price Per Day</label>
+                <input type="number" name="rental_price" id="id_rental_price" class="form-control" required>
+            </div>
+        
+            <!-- Image Field -->
+            <div class="form-group">
+                <label for="id_image">Car Image</label>
+                <input type="file" name="image" id="id_image" class="form-control-file" accept="image/*" required>
+            </div>
+        
+            <!-- Save and Cancel Buttons -->
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{% url 'profile' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+
+</body>
+</html>

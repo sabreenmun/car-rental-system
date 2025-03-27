@@ -1,0 +1,211 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Cars - DriveShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #a0722d;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .header .nav
+        {
+            display: flex;
+            gap: 15px;
+        }
+        .header .nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: 0.3s;
+            background-color: #825b21; /* Light blue background */
+            padding: 8px 12px; /* Padding for button-like appearance */
+            border-radius: 8px; /* Rounded corners */
+            display: inline-block; /* Ensures padding applies correctly */
+        }
+        .header .nav a:hover {
+            color: #ffc107;
+        }
+        .search-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .search-results {
+            margin-top: 30px;
+        }
+        .car-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .car-card:hover {
+            transform: translateY(-5px);
+        }
+        .car-card img {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        .car-card .card-body {
+            padding: 20px;
+        }
+        .car-card .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .car-card .card-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .badge {
+            font-size: 0.9rem;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #a0722d;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+        }
+
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <header class="header">
+        <div class="logo">🚗 DriveShare</div>
+        <button class="navbar-toggler" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    
+        <nav class="nav">
+            <a href="{% url 'profile' %}">Profile</a>
+            <!-- Role Toggle Buttons -->
+            {% if request.user.is_superuser %}
+            <a href="{% url 'car_renter_login' %}">Log in as a Car Renter</a>
+            {% else %}
+            <a href="{% url 'car_owner_login' %}">Log in as a Car Owner</a>
+            {% if not request.user.is_superuser %}
+            <a href="{% url 'my_bookings' %}">My Bookings</a>
+            {% endif %}
+            {% endif %}
+            
+            <!-- <a href="{% url 'home' %}">Home</a>-->
+    
+            <!-- Existing Buttons -->
+            {% if request.user.is_superuser %}
+            <a href="{% url 'car_create' %}">+ Add Cars</a>
+            {% endif %}
+            <a href="{% url 'car_list' %}">Car List</a>
+            
+            {% if user.is_authenticated %}
+            <a href="{% url 'notifications' %}">Notifications({{ unread_notifications_count }})</a>
+            {% endif %}
+            
+            <a href="{% url 'inbox' %}">Messages</a>
+    
+            {% if request.user.is_superuser %}
+            <a href="{% url 'car_owner_login' %}">Log Out</a>
+            {% else %}
+            <a href="{% url 'car_renter_login' %}">Log Out</a>
+            {% endif %}
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="container my-5">
+        <h1 class="text-center fw-bold mb-4">Search Cars</h1>
+
+        <!-- Search Form -->
+        <div class="search-form">
+            <form method="get" action="{% url 'car_search' %}">
+                <div class="row g-3">
+                    {% for field in form %}
+                        <div class="col-md-4">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">🔍 Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results">
+            <h2 class="text-center fw-bold mb-4">Search Results</h2>
+            {% if cars %}
+                <div class="row">
+                    {% for car in cars %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card car-card">
+                                {% if car.image %}
+                                    <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.model }}">
+                                {% else %}
+                                    <img src="{% static 'images/default_car_image.jpg' %}" class="card-img-top" alt="{{ car.model }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ car.model }} ({{ car.year }})</h5>
+                                    <p class="card-text">💰 Rental Price: <strong>${{ car.rental_price }}/day</strong></p>
+                                    {% if car.id in booked_cars %}
+                                    <span class="badge bg-danger">Booked</span>
+                                    {% else %}
+                                        {% if not request.user.is_superuser %}
+                                        <a href="{% url 'book_car' car.id %}" class="btn btn-success btn-sm">Book</a>
+                                        {% endif %}
+                                    {% endif %}
+                                
+                                    <a href="{% url 'car_detail' car.id %}" class="btn btn-success btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center text-muted">No cars found matching your search criteria.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+   
+    <footer>
+        &copy; 2025 DriveShare. All Rights Reserved.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Choice - DriveShare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: #555;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #444;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .btn-option {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        p
+        {
+            margin-bottom: 20px;
+        }
+
+        .btn-renter {
+            background: #a0722d;
+        }
+
+        .btn-owner {
+            background: #2c73c3;
+        }
+
+        .btn-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .back-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            color: #6c757d;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+    
+        }
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+
+    </style>
+       <!-- add Poppins font from Google Fonts -->
+       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2>REGISTER</h2>
+        <p>Select your registration type:</p>
+        <a href="{% url 'car_renter_register' %}" class="btn-option btn-renter">Become a Renter</a>
+        <a href="{% url 'car_owner_register' %}" class="btn-option btn-owner">Become an Owner</a>
+        <a href="{% url 'home' %}" class="back-btn">Back to Home</a>
+    </div>
+</body>
+</html>

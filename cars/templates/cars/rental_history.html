@@ -1,0 +1,28 @@
+<!-- rental_history.html -->
+<h2>Your Rental History</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Car</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>Total Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.car.model }}</td>
+                <td>{{ booking.start_date }}</td>
+                <td>{{ booking.end_date }}</td>
+                <td>{{ booking.status }}</td>
+                <td>{{ booking.total_price }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">You have no rental history.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
