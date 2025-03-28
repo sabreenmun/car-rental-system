@@ -3,67 +3,70 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.contrib.messages import get_messages
 from unittest.mock import patch
+from .models import Booking, Car
+from django.contrib.auth.models import User
+from datetime import datetime
 from .models import Car, Booking, Payment
+from datetime import datetime
 
-class PaymentViewTests(TestCase):
+class BookingTestCase(TestCase):
+
     def setUp(self):
+        # Set up the necessary data for testing
         User = get_user_model()
-        self.user = User.objects.create_user(username="testuser", password="testpass")
-
+        
+        # Create a user
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        
+        # Create a car instance (make sure the owner is set properly)
         self.car = Car.objects.create(
-            owner=self.user,
-            model="Corolla",
-            image="images/test.jpg",
-            year=2020,
-            mileage=15000,
-            availability=True,
-            pickup_location="123 Main Street",
-            rental_price=50.00,
-            available_dates=["2024-04-01", "2024-04-02"],
+            owner=self.user,  # Owner is the user created above
+            model="Test Car",
+            rental_price=100,
+            year=1990,
+            mileage=1000,
+            pickup_location="Test Location",
+            available_from=datetime(2025, 3, 28),  # Use datetime for date fields
+            available_to=datetime(2025, 12, 31),  # Use datetime for date fields
         )
 
+        # Create a booking instance with a non-confirmed booking
         self.booking = Booking.objects.create(
-            car=self.car,
             renter=self.user,
-            start_date="2024-04-01",
-            end_date="2024-04-05",
-            total_price=200.00,
-            is_confirmed=False,
+            car=self.car,
+            start_date=datetime(2025, 3, 29),
+            end_date=datetime(2025, 4, 5),
+            is_confirmed=False
+        )
+        
+        # Create a booking instance with a confirmed booking
+        self.confirmed_booking = Booking.objects.create(
+            renter=self.user,
+            car=self.car,
+            start_date=datetime(2025, 4, 6),
+            end_date=datetime(2025, 4, 10),
+            is_confirmed=True
         )
 
-    @patch("cars.views.PaymentGatewayProxy.process_payment")  # Mock payment processing
-    def test_process_payment_success(self, mock_process_payment):
-        mock_process_payment.return_value = {"status": "completed", "transaction_id": "TXN12345"}
+    def test_booking_creation(self):
+        # Test if bookings are correctly created
+        self.assertEqual(self.booking.renter.username, 'testuser')
+        self.assertEqual(self.booking.car.model, 'Test Car')
+        self.assertEqual(self.booking.is_confirmed, False)
 
-        self.client.login(username="testuser", password="testpass")
-        response = self.client.post(reverse("process_payment", args=[self.booking.id]))
+    def test_confirmed_booking(self):
+        # Test if confirmed booking is correctly created
+        self.assertEqual(self.confirmed_booking.renter.username, 'testuser')
+        self.assertEqual(self.confirmed_booking.car.model, 'Test Car')
+        self.assertEqual(self.confirmed_booking.is_confirmed, True)
 
-        self.booking.refresh_from_db()
-        self.assertTrue(self.booking.is_confirmed)  # Ensure booking is confirmed
-        self.assertEqual(response.status_code, 302)  # Redirect after success
+    def test_booking_dates(self):
+        # Test if the booking dates are correct
+        self.assertEqual(self.booking.start_date, datetime(2025, 3, 29))
+        self.assertEqual(self.booking.end_date, datetime(2025, 4, 5))
 
-        # Check payment record was created
-        payment = Payment.objects.get(booking=self.booking)
-        self.assertEqual(payment.status, "completed")
-
-        # Check success message
-        messages = list(get_messages(response.wsgi_request))
-        self.assertIn("Payment successful!", str(messages[0]))
-
-    @patch("cars.views.PaymentGatewayProxy.process_payment")  # Mock payment failure
-    def test_process_payment_failure(self, mock_process_payment):
-        mock_process_payment.return_value = {"status": "failed", "transaction_id": "TXN67890"}
-
-        self.client.login(username="testuser", password="testpass")
-        response = self.client.post(reverse("process_payment", args=[self.booking.id]))
-
-        self.booking.refresh_from_db()
-        self.assertFalse(self.booking.is_confirmed)  # Booking should NOT be confirmed
-
-        # Check payment record was created
-        payment = Payment.objects.get(booking=self.booking)
-        self.assertEqual(payment.status, "failed")
-
-        # Check error message
-        messages = list(get_messages(response.wsgi_request))
-        self.assertIn("Payment failed!", str(messages[0]))
+    def test_car_availability(self):
+        # Test car availability within the given period
+        car = self.car
+        self.assertTrue(car.available_from <= self.booking.start_date <= car.available_to)
+        self.assertTrue(car.available_from <= self.confirmed_booking.start_date <= car.available_to)

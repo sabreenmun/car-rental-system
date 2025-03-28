@@ -115,51 +115,55 @@
         <h2>Add a New Car</h2>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            
             <!-- Model Field -->
             <div class="form-group">
                 <label for="id_model">Model</label>
-                <input type="text" name="model" id="id_model" class="form-control" required>
+                {{ form.model }}  <!-- This is the form field rendered by Django -->
             </div>
-        
+    
             <!-- Year Field -->
             <div class="form-group">
                 <label for="id_year">Year</label>
-                <input type="number" name="year" id="id_year" class="form-control" required>
+                {{ form.year }}  <!-- This is the form field rendered by Django -->
             </div>
-        
+    
             <!-- Mileage Field -->
             <div class="form-group">
                 <label for="id_mileage">Mileage</label>
-                <input type="number" name="mileage" id="id_mileage" class="form-control" required>
+                {{ form.mileage }}  <!-- This is the form field rendered by Django -->
             </div>
-        
-            <!-- Availability Field -->
+    
+            <!-- Availability From Field -->
             <div class="form-group">
-                <label for="id_availability">Availability</label>
-                <select name="availability" id="id_availability" class="form-control" required>
-                    <option value="True">Available</option>
-                    <option value="False">Not Available</option>
-                </select>
+                <label for="id_availability_from">Availability From</label>
+                {{ form.available_from }}  <!-- Django form field rendering -->
             </div>
-        
+    
+            <!-- Availability To Field -->
+            <div class="form-group">
+                <label for="id_availability_to">Availability To</label>
+                {{ form.available_to }}  <!-- Django form field rendering -->
+            </div>
+    
             <!-- Pickup Location Field -->
             <div class="form-group">
                 <label for="id_pickup_location">Pickup Location</label>
-                <input type="text" name="pickup_location" id="id_pickup_location" class="form-control" required>
+                {{ form.pickup_location }}  <!-- Django form field rendering -->
             </div>
-        
+    
             <!-- Rental Price Field -->
             <div class="form-group">
                 <label for="id_rental_price">Rental Price Per Day</label>
-                <input type="number" name="rental_price" id="id_rental_price" class="form-control" required>
+                {{ form.rental_price }}  <!-- Django form field rendering -->
             </div>
-        
+    
             <!-- Image Field -->
             <div class="form-group">
                 <label for="id_image">Car Image</label>
-                <input type="file" name="image" id="id_image" class="form-control-file" accept="image/*" required>
+                {{ form.image }}  <!-- Django form field rendering -->
             </div>
-        
+    
             <!-- Save and Cancel Buttons -->
             <div class="form-group text-center">
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -167,7 +171,7 @@
             </div>
         </form>
     </div>
-
+    
 
 </body>
 </html>

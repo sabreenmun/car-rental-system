@@ -93,7 +93,18 @@
     </style>
 </head>
 <body>
-
+    <div class="messages">
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
 <div class="form-container">
     <h2>Payment Status for {{ booking.car.model }}</h2>
 

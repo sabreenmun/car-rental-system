@@ -25,10 +25,6 @@ class CarBuilder:
         self.car.mileage = mileage
         return self
 
-    def set_availability(self, availability):
-        self.car.availability = availability
-        return self
-
     def set_pickup_location(self, pickup_location):
         self.car.pickup_location = pickup_location
         return self
@@ -37,8 +33,10 @@ class CarBuilder:
         self.car.rental_price = rental_price
         return self
 
-    def set_available_dates(self, available_dates):
-        self.car.available_dates = available_dates
+    def set_available_dates(self, available_from, available_to):
+        """Sets the available rental period with a start and end date."""
+        self.car.available_from = available_from
+        self.car.available_to = available_to
         return self
 
     def build(self):

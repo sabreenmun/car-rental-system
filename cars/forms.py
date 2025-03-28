@@ -2,20 +2,28 @@ from django import forms
 from .models import *
 
 class CarForm(forms.ModelForm):
-    available_dates = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "datepicker", "placeholder": "Select dates"}),
-        required=False
+    available_from = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "date", "class": "datepicker"}),
+        required=True
+    )
+    available_to = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "date", "class": "datepicker"}),
+        required=True
     )
 
     class Meta:
         model = Car
-        fields = ["model", "image", "year", "mileage", "availability", "pickup_location", "rental_price", "available_dates"]
+        fields = ["model", "image", "year", "mileage", "pickup_location", "rental_price", "available_from", "available_to"]
 
-    def clean_available_dates(self):
-        dates = self.cleaned_data["available_dates"]
-        return dates.split(",") if dates else [] 
+    def clean(self):
+        cleaned_data = super().clean()
+        available_from = cleaned_data.get("available_from")
+        available_to = cleaned_data.get("available_to")
 
+        if available_from and available_to and available_from > available_to:
+            raise forms.ValidationError("Available from date cannot be after available to date.")
 
+        return cleaned_data
 
 class BookingForm(forms.ModelForm):
     class Meta:
@@ -25,15 +33,14 @@ class BookingForm(forms.ModelForm):
             "start_date": forms.DateInput(attrs={"type": "date"}),
             "end_date": forms.DateInput(attrs={"type": "date"}),
         }
+
     def clean(self):
         cleaned_data = super().clean()
-        
-        # **Ensure instance exists before accessing car**
-        if not self.instance.pk:  # Check if instance is new
-            return cleaned_data
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
 
-        if not self.instance.car:  
-            raise forms.ValidationError("Car is not assigned to this booking.")
+        if start_date and end_date and start_date >= end_date:
+            raise forms.ValidationError("End date must be after start date.")
 
         return cleaned_data
 

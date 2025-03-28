@@ -137,8 +137,8 @@
                             <div class="detail-item">
                                 <i class="fas fa-calendar-check"></i>
                                 <strong>Availability:</strong>
-                                <span class="availability-badge {% if car.availability %}bg-success{% else %}bg-danger{% endif %}">
-                                    {% if car.availability %} Available {% else %} Not Available {% endif %}
+                                <span>
+                                    {{ car.available_from|date:"F j, Y" }} to {{ car.available_to|date:"F j, Y" }}
                                 </span>
                             </div>
                             <div class="detail-item">
@@ -170,6 +170,49 @@
                                 {% endif %}
                             </div>
                         </div>
+                    <!-- New section for bookings -->
+                    {% if request.user == car.owner %}
+                    <div class="mt-4">
+                        <h4>Bookings for this Car:</h4>
+                        {% if car.bookings.count > 0 %}
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Renter</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in car.bookings.all %}
+                                        <tr>
+                                            <td>{{ booking.renter.username }}</td>
+                                            <td>{{ booking.start_date|date:"F j, Y" }}</td>
+                                            <td>{{ booking.end_date|date:"F j, Y" }}</td>
+                                            <td>
+                                                {% if booking.is_confirmed %}
+                                                    Confirmed
+                                                {% else %}
+                                                    Unconfirmed
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <form action="{% url 'delete_booking' booking.id %}" method="POST" style="display:inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No bookings yet for this car.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
                         
                         <!-- Review Submission Form -->
                         {% if not request.user.is_superuser %}

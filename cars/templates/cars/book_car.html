@@ -1,3 +1,4 @@
+<!--This page is for when a user is actually booking a car.-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,57 +34,51 @@
             transition: transform 0.3s ease-in-out;
         }
         .form-container:hover {
-            transform: translateY(-5px);
+                transform: translateY(-5px);
         }
         .btn-payment {
-    background-color: green;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.btn-payment:hover {
-    background-color: #006400; /* Darker green on hover */
-    transform: scale(1.05);
-}
-
-.btn-payment:active {
-    background-color: #004d00; /* Even darker green when clicked */
-}
-
-.btn-outline-secondary {
-    background-color: #f2f2f2; /* Light grey */
-    border: 1px solid #f2f2f2;
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.btn-outline-secondary:hover {
-    background-color: #e0e0e0; /* Slightly darker grey on hover */
-    color: #ffffff; /* Keep the text white */
-    transform: translateY(-2px);
-}
-
-.btn-outline-secondary:active {
-    background-color: #d0d0d0; /* Darker grey when clicked */
-    color: #ffffff;
-}
-
-        h2 {
-            text-align: center;
+        background-color: green;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        }
+        .btn-payment:hover {
+            background-color: #006400; /* Darker green on hover */
+            transform: scale(1.05);
+        }
+        .btn-payment:active {
+            background-color: #004d00;
+        }
+    .btn-outline-secondary {
+        background-color: #f2f2f2;
+        border: 1px solid #f2f2f2;
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #e0e0e0;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+    .btn-outline-secondary:active {
+        background-color: #d0d0d0;
+        color: #ffffff;
+    }
+    h2 {
+           text-align: center;
             margin-bottom: 20px;
             color: #000000;
             font-weight: 600;
-            font-size: 1.8rem;
-        }
+            font-size: 1.8rem; 
+    }
         .form-control {
             background-color: rgba(255, 255, 255, 0.3);
             border: none;
@@ -157,10 +152,20 @@
     </style>
 </head>
 <body>
-
+    <div class="messages">
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
 <div class="form-container">
     <h2>Book Car: {{ car.model }}</h2>
-
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
@@ -179,18 +184,9 @@
             <button type="submit" class="btn-payment">
                 <i class="fas fa-credit-card me-2"></i>Proceed to Payment
             </button>
-                <a href="{% url 'car_list' %}" class="btn btn-secondary">Back</a>
-            </a>
+            <a href="{% url 'car_list' %}" class="btn btn-secondary">Back</a>
         </div>
     </form>
-
-    {% if messages %}
-        <ul class="message-list">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
 </div>
 
 
