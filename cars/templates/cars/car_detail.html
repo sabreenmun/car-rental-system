@@ -213,31 +213,6 @@
                         {% endif %}
                     </div>
                 {% endif %}
-                        
-                        <!-- Review Submission Form -->
-                        {% if not request.user.is_superuser %}
-                            <div class="mt-4">
-                                <h4>Leave a Review:</h4>
-                                <form action="{% url 'submit_review' car.id %}" method="POST">
-                                    {% csrf_token %}
-                                    <div class="mb-3">
-                                        <label for="rating" class="form-label">Rating</label>
-                                        <select name="rating" id="rating" class="form-select">
-                                            <option value="1">1 Star</option>
-                                            <option value="2">2 Stars</option>
-                                            <option value="3">3 Stars</option>
-                                            <option value="4">4 Stars</option>
-                                            <option value="5">5 Stars</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="comment" class="form-label">Comment</label>
-                                        <textarea name="comment" id="comment" rows="4" class="form-control"></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-custom">Submit Review</button>
-                                </form>
-                            </div>
-                        {% endif %}
                        
                         <div class="review-section">
                             <h4>Reviews:</h4>
@@ -261,7 +236,6 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
-                        
                     </div>
                 </div>
             </div>

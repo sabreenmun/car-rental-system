@@ -1,3 +1,4 @@
+from datetime import date
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Car
@@ -15,6 +16,7 @@ import random
 from designpatterns.carbuilder import CarBuilder
 from designpatterns.proxy import PaymentGatewayProxy
 from django.db.models import Q 
+from notifications.models import Review
 
 @login_required
 def car_list(request):
@@ -119,6 +121,11 @@ class CarDetailView(DetailView):
         booking = Booking.objects.filter(car=car).first()  
         context['booking'] = booking 
 
+        
+        # Fetch all reviews related to the car
+        reviews = Review.objects.filter(car=car)  # Fetch all reviews for the car
+        context['reviews'] = reviews
+        
         return context 
 
 
@@ -268,8 +275,12 @@ def payment_status(request, booking_id):
 def my_bookings(request):
     # Filter bookings for the logged-in user
     bookings = Booking.objects.filter(renter=request.user)
-    
-    return render(request, "cars/my_bookings.html", {"bookings": bookings})
+
+    # Pass today's date to the template
+    return render(request, "cars/my_bookings.html", {
+        "bookings": bookings,
+        "today": date.today()  # Pass today's date to compare with booking end dates
+    })
 
 @login_required
 def car_search(request):

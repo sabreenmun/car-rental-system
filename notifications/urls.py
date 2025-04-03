@@ -5,7 +5,7 @@ from .views import *
 urlpatterns = [
     path('', notifications, name='notifications'),
     path('notification/delete/<int:notification_id>/', delete_notification, name='delete_notification'),
-    path("review/<int:car_id>/", submit_review, name="submit_review"),
+    path("review/<int:booking_id>/", submit_review, name="submit_review"),
     path("extra/", extra, name="extra"),
     
 ]
