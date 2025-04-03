@@ -31,7 +31,8 @@ def save(self, commit=True):
     user.set_password(self.cleaned_data['password'])
     if commit:
         user.save()
-    # Save the security questions and answers
+   
+   
     car_renter = CarOwner(  
         user=user,
         security_question_1=self.cleaned_data['security_question_1'],

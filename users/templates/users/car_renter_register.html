@@ -15,9 +15,6 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
-
-        /* Header */
         .header {
             background-color: #a0722d;
             color: white;
@@ -59,7 +56,6 @@
             margin-left: auto; 
             margin-right: auto; 
         }
-
         .form-container h2 {
             text-align: center;
             margin-bottom: 25px;
@@ -67,8 +63,6 @@
             font-weight: 600;
             color: #333;
         }
-
-        /* Form fields */
         .form-control {
             background-color: #f1f1f1;
             border: 1px solid #ddd;
@@ -78,21 +72,17 @@
             color: #333;
             transition: 0.3s ease;
         }
-
         .form-control:focus {
             background-color: #fff;
             border-color: #a0722d;
             box-shadow: 0 0 5px rgba(160, 114, 45, 0.5);
         }
-
         .form-label {
             font-size: 1rem;
             font-weight: 500;
             color: #444;
             margin-bottom: 10px;
         }
-
-
         /* Footer */
         footer {
             text-align: center;
@@ -100,15 +90,15 @@
             background-color: #a0722d;
             color: white;
             width: 100%;
-            margin-top: auto; /* Push footer to the bottom */
+            margin-top: auto;
         }
-
         .footer-spacer {
             flex-grow: 1;
         }
     </style>
 </head>
 <body>
+
     <!-- Header -->
     <header class="header">
         <div class="logo">🚗 DriveShare</div>
@@ -121,6 +111,7 @@
             <a href="{% url 'register_choice' %}" class="secondary">Register</a>
         </nav>
     </header>
+
     <!-- Registration Form -->
     <div class="form-container">
         <h2>Renter Registration</h2>
@@ -129,7 +120,13 @@
             {% for field in form %}
                 <div class="mb-3">
                     <label class="form-label">{{ field.label }}</label>
-                    <input type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value|default:'' }}" class="form-control" />
+                    {% if field.name == 'security_question_1' or field.name == 'security_question_2' or field.name == 'security_question_3' %}
+                        <!-- render the security questions as readonly (non-editable) -->
+                        <input type="text" name="{{ field.name }}" value="{{ field.value|default:'' }}" class="form-control" readonly />
+                    {% else %}
+                        <!-- render other fields normally -->
+                        <input type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value|default:'' }}" class="form-control" />
+                    {% endif %}
                     {% if field.errors %}
                         <div class="text-danger">{{ field.errors|striptags }}</div>
                     {% endif %}
@@ -137,11 +134,14 @@
             {% endfor %}
             <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
+
         <p class="text-center mt-3">Already have an account? <a href="{% url 'car_renter_login' %}">Log in</a></p>
     </div>
+
     <!-- Footer -->
     <footer>
         &copy; 2025 DriveShare. All Rights Reserved.
     </footer>
+
 </body>
 </html>

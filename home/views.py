@@ -12,7 +12,7 @@ from designpatterns.sessionmanager import SessionManager
 
 User = get_user_model()
 
-
+#for navigation bar
 def home(request):
     return render(request, 'home/homepage.html')  
 
@@ -24,7 +24,6 @@ def contact(request):
 
 def help(request):
     return render(request, 'home/help.html')
-
 
 
 def car_owner_register(request):

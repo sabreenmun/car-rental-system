@@ -1,3 +1,4 @@
+#views.py in the Message app.
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -7,9 +8,10 @@ from .forms import MessageForm
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 
+#method to 
 @login_required
 def inbox(request):
-    """ Show all conversations based on the user type """
+    """ show allof conversations based on the user type """
     if request.user.is_superuser: 
         conversations = Conversation.objects.filter(owner=request.user).order_by("-last_updated")
     else: 
@@ -20,6 +22,7 @@ def inbox(request):
 from notifications.models import Notification
 
 
+#method to delete a convo
 @login_required
 def delete_conversation(request, conversation_id):
     if request.method == "POST":
@@ -34,7 +37,7 @@ def delete_conversation(request, conversation_id):
     
     return redirect("inbox")
 
-
+#method to 
 @login_required
 def chat_room(request, conversation_id):
     conversation = get_object_or_404(Conversation, id=conversation_id)

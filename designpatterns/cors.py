@@ -1,4 +1,4 @@
-#cors.py
+#This is where the cors pattern functionality goes.
 
 class SecurityQuestionHandler:
     def __init__(self, next_handler=None):

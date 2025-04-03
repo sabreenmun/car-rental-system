@@ -1,6 +1,7 @@
 from django import forms
 from .models import *
 
+#create car form for car owners
 class CarForm(forms.ModelForm):
     available_from = forms.DateField(
         widget=forms.DateInput(attrs={"type": "date", "class": "datepicker"}),
@@ -25,6 +26,7 @@ class CarForm(forms.ModelForm):
 
         return cleaned_data
 
+#book car form for car renters
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
@@ -44,7 +46,7 @@ class BookingForm(forms.ModelForm):
 
         return cleaned_data
 
-
+#search car form for car owners/renters
 class CarSearchForm(forms.Form):
     model = forms.CharField(required=False, max_length=100, label="Car Model")
     rental_price_min = forms.DecimalField(required=False, label="Min Rental Price", max_digits=10, decimal_places=2)

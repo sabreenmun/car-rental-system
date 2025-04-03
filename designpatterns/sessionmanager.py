@@ -1,3 +1,4 @@
+#This is where the singleton pattern functionality goes.
 class SessionManager:
     _instance = None
 

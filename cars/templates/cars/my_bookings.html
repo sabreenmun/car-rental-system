@@ -122,11 +122,15 @@
                             {% endif %}
                         </p>
                         
-                        <!-- Display the 'Leave Review' button only if the booking has ended -->
+                        <!-- display the 'Leave Review' button only if the booking has ended -->
                         {% if booking.end_date < today %}
                             <a href="{% url 'submit_review' booking.id %}" class="btn btn-warning btn-sm">Leave Review</a>
+                        {% else %}
+                            <form action="{% url 'delete_booking' booking.id %}" method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                            </form>
                         {% endif %}
-
                         <a href="{% url 'car_detail' booking.car.id %}" class="btn btn-primary btn-sm">View Car Details</a>
                     </div>
                 </div>

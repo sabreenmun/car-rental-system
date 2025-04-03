@@ -1,7 +1,6 @@
 from .models import*
 from .forms import *
 from django.contrib.auth import get_user_model
-User = get_user_model()
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -9,6 +8,8 @@ from cars.models import Car, Booking, Rental
 from notifications.models import  Review
 from designpatterns.cors import SecurityQuestion1Handler, SecurityQuestion2Handler, SecurityQuestion3Handler
 from designpatterns.sessionmanager import SessionManager
+
+User = get_user_model()
 
 def car_renter_register(request):
     if request.method == "POST":
@@ -36,8 +37,6 @@ def car_renter_register(request):
         form = CarRenterRegistrationForm()
     
     return render(request, 'users/car_renter_register.html', {'form': form})
-
-
 
 def car_renter_login(request):
     if request.method == "POST":

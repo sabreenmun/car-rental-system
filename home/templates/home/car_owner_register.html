@@ -17,8 +17,6 @@
             min-height: 100vh;
         }
 
-
-        /* Header */
         .header {
             background-color: #a0722d;
             color: white;
@@ -69,7 +67,7 @@
             color: #333;
         }
 
-        /* Form fields */
+       
         .form-control {
             background-color: #f1f1f1;
             border: 1px solid #ddd;
@@ -94,19 +92,19 @@
         }
 
 
-        /* Footer */
         footer {
             text-align: center;
             padding: 10px 0;
             background-color: #a0722d;
             color: white;
             width: 100%;
-            margin-top: auto; /* Push footer to the bottom */
+            margin-top: auto; 
         }
 
         .footer-spacer {
             flex-grow: 1;
         }
+
     </style>
 </head>
 <body>
@@ -131,16 +129,19 @@
             {% for field in form %}
                 <div class="mb-3">
                     <label class="form-label">{{ field.label }}</label>
-                    
-                    <input type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value|default:'' }}" class="form-control" />
+                    {% if field.name == 'security_question_1' or field.name == 'security_question_2' or field.name == 'security_question_3' %}
+                        <!-- render the security questions as readonly (non-editable) -->
+                        <input type="text" name="{{ field.name }}" value="{{ field.value|default:'' }}" class="form-control" readonly />
+                    {% else %}
+                        <!-- render other fields normally -->
+                        <input type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value|default:'' }}" class="form-control" />
+                    {% endif %}
                     {% if field.errors %}
                         <div class="text-danger">{{ field.errors|striptags }}</div>
                     {% endif %}
                 </div>
             {% endfor %}
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary w-100">Register</button>
-            </div>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
         <p class="text-center mt-3">Already have an account? <a href="{% url 'car_owner_login' %}">Log in</a></p>
     </div>

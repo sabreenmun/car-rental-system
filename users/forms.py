@@ -2,13 +2,12 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CarRenter, CustomUser
 from django.contrib.auth import get_user_model
-User = get_user_model()
 from django import forms
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-CustomUser = get_user_model()  # this fetches your custom user model
 
+CustomUser = get_user_model()
 
 class CarRenterRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -52,7 +51,6 @@ def save(self, commit=True):
         car_renter.save()
     
     return user
-
 
 class CarRenterLoginForm(forms.Form):
     username = forms.CharField()
