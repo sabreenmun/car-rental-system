@@ -67,7 +67,7 @@
             color: #333; /* Black color for transaction ID */
         }
         .amount-paid {
-            color: #333; /* Black color for amount paid */
+            color: #333;
         }
         .btn-outline-secondary {
             background-color: transparent;
@@ -92,19 +92,7 @@
         }
     </style>
 </head>
-<body>
-    <div class="messages">
-        {% if messages %}
-            <ul>
-                {% for message in messages %}
-                    <li class="{{ message.tags }}">
-                        {{ message }}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
+<body>  
 <div class="form-container">
     <h2>Payment Status for {{ booking.car.model }}</h2>
 
@@ -126,10 +114,19 @@
     {% else %}
         <p class="no-payment">No payment record found.</p>
     {% endif %}
-
+    
     <div class="text-center">
-        <a href="{% url 'book_car' booking.car.id %}" class="btn btn-outline-secondary w-100">
-            <i class="fas fa-arrow-left me-2"></i>Go Back
+        <div class="messages">
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}  
+        </div>
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary w-100">
+            <i class="fas fa-arrow-left me-2"></i>Profile
         </a>
     </div>
 </div>

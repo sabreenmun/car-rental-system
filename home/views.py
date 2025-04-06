@@ -5,10 +5,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from .models import *
 from .forms import *
-from cars.models import Rental
 from django.http import HttpResponse
 from designpatterns.cors import SecurityQuestion1Handler, SecurityQuestion2Handler, SecurityQuestion3Handler
-from designpatterns.sessionmanager import SessionManager
+from designpatterns.singleton import Singleton
 
 User = get_user_model()
 
@@ -55,6 +54,9 @@ def car_owner_register(request):
 
 
 def car_owner_login(request):
+    storage = messages.get_messages(request)
+    storage.used = True 
+    
     if request.method == "POST":
         form = CarOwnerLoginForm(request.POST)
         if form.is_valid():
@@ -62,14 +64,20 @@ def car_owner_login(request):
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
             if user is not None and user.is_superuser:
-                session_manager = SessionManager()  # Singleton instance
+                session_manager = Singleton()  # Singleton instance
                 session_manager.login_user(request, user)
-                return redirect('car_list')  # Redirect to the appropriate page
+        
+                return redirect('car_list')
+            else:
+                messages.error(request, 'Invalid credentials for a car owner.')
+        else:
+            messages.error(request, 'Invalid form submission. Please try again.')
 
     else:
         form = CarOwnerLoginForm()
 
     return render(request, 'home/car_owner_login.html', {'form': form})
+
 
 def request_password_reset(request):
     if request.method == "POST":
@@ -80,11 +88,14 @@ def request_password_reset(request):
             if user:
                 request.session['reset_user_id'] = user.id
                 return redirect('verify_security_questions')
-
+            else:
+                #add error message
+                messages.error(request, "Invalid username!")
     else:
         form = PasswordResetForm()
 
     return render(request, 'home/register_password_reset.html', {'form': form})
+
 
 def verify_security_questions(request):
     user_id = request.session.get('reset_user_id')
@@ -94,32 +105,37 @@ def verify_security_questions(request):
     user = get_object_or_404(User, id=user_id)
     car_owner = get_object_or_404(CarOwner, user=user)
 
-    # Create the chain of responsibility
+    #create the chain of responsibilities
     handler1 = SecurityQuestion1Handler()
-    handler2 = SecurityQuestion2Handler(handler1)
-    handler3 = SecurityQuestion3Handler(handler2)
+    handler2 = SecurityQuestion2Handler()
+    handler3 = SecurityQuestion3Handler()
 
+    #set successors for future handling
+    handler1.set_successor(handler2)
+    handler2.set_successor(handler3)
+   
     if request.method == "POST":
         form = SecurityQuestionForm(request.POST)
         if form.is_valid():
+            # retrieve answers and question number from the form
             security_answer_1 = form.cleaned_data['security_answer_1']
             security_answer_2 = form.cleaned_data['security_answer_2']
             security_answer_3 = form.cleaned_data['security_answer_3']
 
-            # Verify answers through the chain of responsibility
-            if (handler3.handle(car_owner, security_answer_1, 1) and
-                handler3.handle(car_owner, security_answer_2, 2) and
-                handler3.handle(car_owner, security_answer_3, 3)):
+            # verify answers through the chain of responsibility
+            if (handler1.handle_request(car_owner, security_answer_1, 1) and
+                handler1.handle_request(car_owner, security_answer_2, 2) and
+                handler1.handle_request(car_owner, security_answer_3, 3)):
                 
                 request.session['security_verified'] = True
                 return redirect('set_new_password')
             else:
-                form.add_error(None, 'One or more answers are incorrect.')
+                form.add_error(None, 'One or more of your answers are incorrect. Please try again.')
 
     else:
         form = SecurityQuestionForm()
 
-    # Ensure a response is returned in all cases
+    # make sure a response is returned in all cases
     return render(request, 'home/verify_security_questions.html', {'form': form})
 
 
@@ -139,6 +155,8 @@ def set_new_password(request):
                 user.set_password(new_password)
                 user.save()
                 return redirect('car_owner_login')
+            else:
+                 form.add_error('confirm_password', 'Passwords do not match!') 
 
     else:
         form = SetNewPasswordForm()

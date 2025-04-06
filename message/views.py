@@ -7,6 +7,7 @@ from cars.models import Car
 from .forms import MessageForm
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
+from designpatterns.observer import ConcreteObserver, NotificationSystem
 
 #method to 
 @login_required
@@ -37,7 +38,7 @@ def delete_conversation(request, conversation_id):
     
     return redirect("inbox")
 
-#method to 
+#method to use chatroom. 
 @login_required
 def chat_room(request, conversation_id):
     conversation = get_object_or_404(Conversation, id=conversation_id)
@@ -51,6 +52,7 @@ def chat_room(request, conversation_id):
             message_text = form.cleaned_data['text']
             receiver = conversation.owner if request.user == conversation.renter else conversation.renter
 
+            # Create the message
             message = Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
@@ -58,13 +60,21 @@ def chat_room(request, conversation_id):
                 text=message_text
             )
 
-            
-            Notification.objects.create(
-                user=receiver,
-                message=f"You have a new message from {request.user.username}."
-            )
+            #create the notification System (subject)
+            notification_system = NotificationSystem()
 
+            #create a concrete observer for the receiver (car owner or renter)
+            observer = ConcreteObserver(receiver)
+            
+            #register the observer
+            notification_system.register_observer(observer)
+
+            #notify all observers (send notifications)
+            notification_system.notify_observers(f"You have a new message from {request.user.username}.")
+
+            #update the conversation with the latest message
             conversation.last_message = message.text
+
             conversation.save()
 
             return JsonResponse({

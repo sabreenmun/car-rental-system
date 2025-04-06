@@ -69,25 +69,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment for {self.booking.car.model} - {self.status}"
-
-
-#unused. delete later!
-class CarBooking(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    status = models.CharField(max_length=100, choices=[('booked', 'Booked'), ('completed', 'Completed')])
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-
-#unused! delete later!
-class Rental(models.Model):
-    car_owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='owned_cars', on_delete=models.CASCADE)
-    renter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='rented_cars', on_delete=models.CASCADE)
-    car = models.ForeignKey('Car', on_delete=models.CASCADE)  
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f"Rental of {self.car} by {self.renter.username}"

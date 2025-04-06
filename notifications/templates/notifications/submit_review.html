@@ -1,5 +1,115 @@
+
+<style>
+    body {
+       background: white;
+       font-family: 'Poppins', sans-serif;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       min-height: 100vh;
+       margin: 0;
+       animation: fadeIn 1s ease-in-out;
+   }
+   @keyframes fadeIn {
+       from { opacity: 0; transform: scale(0.9); }
+       to { opacity: 1; transform: scale(1); }
+   }
+   .form-container {
+       max-width: 500px;
+       width: 100%;
+       background: white;
+       padding: 35px;
+       border-radius: 15px;
+       backdrop-filter: blur(12px);
+       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+       transition: transform 0.3s ease-in-out;
+   }
+
+.container {
+   width: 100%;
+   max-width: 600px;
+   background-color: white;
+   padding: 30px;
+   border-radius: 8px;
+   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+   text-align: center;
+   margin-bottom: 20px;
+   color: #333;
+}
+
+.form-group {
+   margin-bottom: 15px;
+}
+
+label {
+   font-size: 1rem;
+   color: #555;
+   display: block;
+   margin-bottom: 8px;
+}
+
+input[type="number"], textarea {
+   width: 100%;
+   padding: 10px;
+   font-size: 1rem;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   background-color: #fff;
+}
+
+input[type="number"]:focus, textarea:focus {
+   border-color: #007BFF;
+   outline: none;
+}
+
+textarea {
+   resize: vertical;
+}
+
+.form-buttons {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-top: 20px;
+}
+
+.submit-btn {
+   background-color: #a0722d;
+   color: white;
+   padding: 10px 20px;
+   font-size: 1rem;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+}
+
+.submit-btn:hover {
+   background-color: #76521d;
+}
+
+.cancel-btn {
+    background-color: #8b8c92;
+   color: white;
+   padding: 10px 20px;
+   font-size: 1rem;
+   text-decoration: none;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+}
+
+.cancel-btn:hover {
+    background-color: #6c6d73;
+    text-decoration: none;
+}
+
+</style>
+
 <div class="container">
-    <h2>Submit a Review for {{ car }}</h2>
+    <h2>Review</h2>
 
     <form method="POST" class="review-form">
         {% csrf_token %}
@@ -20,110 +130,3 @@
         </div>
     </form>
 </div>
-
-<!-- Style for the form -->
-<style>
-         body {
-            background: white;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            animation: fadeIn 1s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .form-container {
-            max-width: 500px;
-            width: 100%;
-            background: white;
-            padding: 35px;
-            border-radius: 15px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-in-out;
-        }
-
-    .container {
-        width: 100%;
-        max-width: 600px;
-        background-color: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #333;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-    }
-
-    label {
-        font-size: 1rem;
-        color: #555;
-        display: block;
-        margin-bottom: 8px;
-    }
-
-    input[type="number"], textarea {
-        width: 100%;
-        padding: 10px;
-        font-size: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #fff;
-    }
-
-    input[type="number"]:focus, textarea:focus {
-        border-color: #007BFF;
-        outline: none;
-    }
-
-    textarea {
-        resize: vertical;
-    }
-
-    .form-buttons {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-    }
-
-    .submit-btn {
-        background-color: #007BFF;
-        color: white;
-        padding: 10px 20px;
-        font-size: 1rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .submit-btn:hover {
-        background-color: #0056b3;
-    }
-
-    .cancel-btn {
-        color: #007BFF;
-        text-decoration: none;
-        font-size: 1rem;
-    }
-
-    .cancel-btn:hover {
-        text-decoration: underline;
-    }
-
-    .cancel-btn:active {
-        color: #0056b3;
-    }
-</style>

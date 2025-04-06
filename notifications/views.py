@@ -10,9 +10,9 @@ from .models import Review
 from cars.models import Car, Booking
 from django.http import HttpResponse
 from django.utils import timezone
+from designpatterns.observer import ConcreteObserver, NotificationSystem
 
-
-#method to view notifs
+#method to view notifs, renders form.
 @login_required
 def notifications(request):
     user_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
@@ -58,6 +58,7 @@ def submit_review(request, booking_id):
 
         reviewed_user = booking.car.owner
         car = booking.car
+
          #create the review
         review = Review.objects.create(
             booking=booking,  
@@ -67,8 +68,21 @@ def submit_review(request, booking_id):
             rating=rating,
             comment=comment
         )
-        review.save()
 
+        #create the notification System (subject)
+        notification_system = NotificationSystem()
+
+        #create a concrete observer for the receiver (car owner or renter)
+        observer = ConcreteObserver(reviewed_user)
+            
+        #register the observer
+        notification_system.register_observer(observer)
+
+        #notify all observers (send notifications)
+        notification_system.notify_observers(f"You have received a new review from {request.user.username} on your car {car.model}.")
+        
+        review.save()
+        
         #redirect to the car detail page after review submission
         return redirect('my_bookings')
 

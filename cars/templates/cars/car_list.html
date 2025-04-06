@@ -124,59 +124,59 @@
     
  <!-- Main Content -->
 <div class="hero">
-    <!-- Check if the user is a superuser -->
+    <!-- check if the user is a superuser -->
     {% if request.user.is_superuser %}
-        <!-- Display heading for superuser (My Car Listings) -->
+        <!-- show heading for superuser -->
         <h2 class="text-center fw-bold">My Car Listings</h2>
         <div class="text-center">
-            <!-- Button to allow the superuser to add a new car -->
+            <!-- btn to allow the owner to add a new car -->
             <a href="{% url 'car_create' %}" class="btn btn-primary my-3 btn-sm">+ Add New Car</a>
         </div>
     {% else %}
-        <!-- Display heading for regular users (Available Cars) -->
+        <!-- display heading for regular users -->
         <h2 class="text-center fw-bold">Available Cars</h2>
     {% endif %}
 
-    <!-- Begin displaying all cars -->
+    <!-- display all cars -->
     <div class="row">
         {% for car in cars %}
         <div class="col-md-4 mb-4">
             <div class="card shadow-lg">
-                <!-- Display car image if available, otherwise show default image -->
+                <!-- showw car image if available, otherwise show default image -->
                 {% if car.image %}
                     <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.model }}" style="height: 200px; object-fit: cover;">
                 {% else %}
                     <img src="{% static 'images/default_car_image.jpg' %}" class="card-img-top" alt="{{ car.model }}" style="height: 200px; object-fit: cover;">
                 {% endif %}
                 <div class="card-body text-center">
-                    <!-- Display car model and year -->
+                    <!-- show car model and year -->
                     <h5 class="card-title">{{ car.model }} ({{ car.year }})</h5>
                     <p class="card-text">💰 Rental Price: <strong>${{ car.rental_price }}/day</strong></p>
 
-                    <!-- Display available_from and available_to dates -->
+                    <!-- show available_from and available_to dates -->
                     {% if car.available_from and car.available_to %}
                         <p class="card-text">🗓️ Available From: {{ car.available_from|date:"F j, Y" }} to {{ car.available_to|date:"F j, Y" }}</p>
                     {% endif %}
 
-                    <!-- Check if the car is already booked by someone -->
+                    <!-- check  if the car is already booked by someone -->
                     {% if car_info.car.id in booked_cars %}
                         {% if request.user.id in booked_renters %}
-                            <!-- The current user has already booked this car, so show "Booked" button -->
+                            <!-- the current user has already booked this car, so show "Booked" button -->
                             <button class="btn btn-secondary btn-sm" disabled>Booked</button>
                         {% else %}
-                            <!-- The car is booked by someone else, show "Book" button -->
+                            <!-- the car is booked by someone else, show "Book" button -->
                             <a href="{% url 'book_car' car_info.car.id %}" class="btn btn-primary btn-sm">Book</a>
                         {% endif %}
                     {% else %}
-                        <!-- If the car is not booked, show "Book" button for non-superusers -->
+                        <!-- if the car is not booked, show "Book" button for non-superusers -->
                         {% if not request.user.is_superuser %}
                             <a href="{% url 'book_car' car.id %}" class="btn btn-primary btn-sm">Book</a>
                         {% endif %}
                     {% endif %}
-                    <!-- View car details -->
+                    <!-- show car details -->
                     <a href="{% url 'car_detail' car.id %}" class="btn btn-success btn-sm">View Details</a>
 
-                    <!-- Show delete button only for superusers -->
+                    <!-- show delete button only for admin -->
                     {% if request.user.is_superuser %}
                         <a href="{% url 'car_delete' car.id %}" class="btn btn-danger btn-sm">Delete</a>
                     {% endif %}
@@ -184,7 +184,7 @@
             </div>
         </div>
         {% empty %}
-            <!-- Message when there are no cars listed -->
+            <!-- messgae when there are no cars listed -->
             <p class="text-center">No cars listed yet.</p>
         {% endfor %}
     </div>

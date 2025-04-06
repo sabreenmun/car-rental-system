@@ -1,37 +1,51 @@
-#designpatterns/observer.py
+# designpatterns/observer.py
 from abc import ABC, abstractmethod
 from notifications.models import Notification
 
-#subject interface
-class BookingNotifier(ABC):
+#SUBJECT INTERFACE
+class Subject(ABC):
     @abstractmethod
+    def register_observer(self, observer):
+        pass
+
+    @abstractmethod
+    def remove_observer(self, observer):
+        pass
+
+    @abstractmethod
+    def notify_observers(self, message):
+        pass
+
+# OBSERVER INTERFACE (Abstract Class)
+class Observer(ABC):
+    @abstractmethod
+    def update(self, message):
+        pass
+
+# CONCRETE OBSERVER
+class ConcreteObserver(Observer):
+    def __init__(self, user):
+        self.user = user
+
+    def update(self, message):
+        Notification.objects.create(user=self.user, message=message)
+        print(f"Notification sent to {self.user.username}: {message}")
+
+# CONCRETE SUBJECT
+class NotificationSystem(Subject):
     def __init__(self):
         self._observers = []
 
-    @abstractmethod
-    def register(self, observer):
-        self._observers.append(observer)
+    def register_observer(self, observer):
+        if observer not in self._observers:
+            self._observers.append(observer)
 
-    @abstractmethod
-    def remove(self, observer):
-        self._observers.remove(observer)
+    def remove_observer(self, observer):
+        if observer in self._observers:
+            self._observers.remove(observer)
 
-    @abstractmethod
-    def notify(self, booking):
+    def notify_observers(self, message):
         for observer in self._observers:
-            observer.update(booking)
+            observer.update(message)
 
-#observer interface
-class Observer(ABC):
-    @abstractmethod
-    def update(self, booking):
-        pass
-
-#concrete observer
-class InAppNotification(Observer):
-    def update(self, booking):
-        message = f"Your booking for {booking.car.model} is now {booking.status}."
-        Notification.objects.create(user=booking.owner, message=message)
-        Notification.objects.create(user=booking.renter, message=message)
-
-
+#notify users in views

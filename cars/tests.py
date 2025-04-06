@@ -8,65 +8,81 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from .models import Car, Booking, Payment
 from datetime import datetime
+from .forms import *
 
-class BookingTestCase(TestCase):
+User = get_user_model()
 
+class CarSearchTestCase(TestCase):
+    
     def setUp(self):
-        # Set up the necessary data for testing
-        User = get_user_model()
-        
-        # Create a user
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
-        
-        # Create a car instance (make sure the owner is set properly)
-        self.car = Car.objects.create(
-            owner=self.user,  # Owner is the user created above
-            model="Test Car",
-            rental_price=100,
-            year=1990,
-            mileage=1000,
-            pickup_location="Test Location",
-            available_from=datetime(2025, 3, 28),  # Use datetime for date fields
-            available_to=datetime(2025, 12, 31),  # Use datetime for date fields
+        # Create a user to associate with the car
+        self.user = User.objects.create_user(username="testuser", password="password")
+
+        # Create some Car instances to search through
+        self.car1 = Car.objects.create(
+            owner=self.user,
+            model="Toyota Camry",
+            image="images/toyota_camry.jpg",  # You may need to mock or adjust the image path for tests
+            year=2020,
+            mileage=15000,
+            pickup_location="New York",
+            rental_price=49.99,
+            available_from=date(2023, 5, 1),
+            available_to=date(2023, 12, 31),
         )
 
-        # Create a booking instance with a non-confirmed booking
-        self.booking = Booking.objects.create(
-            renter=self.user,
-            car=self.car,
-            start_date=datetime(2025, 3, 29),
-            end_date=datetime(2025, 4, 5),
-            is_confirmed=False
+        self.car2 = Car.objects.create(
+            owner=self.user,
+            model="Honda Accord",
+            image="images/honda_accord.jpg",  # Mock or adjust for testing
+            year=2021,
+            mileage=10000,
+            pickup_location="Los Angeles",
+            rental_price=59.99,
+            available_from=date(2023, 6, 1),
+            available_to=date(2023, 11, 30),
         )
         
-        # Create a booking instance with a confirmed booking
-        self.confirmed_booking = Booking.objects.create(
-            renter=self.user,
-            car=self.car,
-            start_date=datetime(2025, 4, 6),
-            end_date=datetime(2025, 4, 10),
-            is_confirmed=True
+        self.car3 = Car.objects.create(
+            owner=self.user,
+            model="Ford Mustang",
+            image="images/ford_mustang.jpg",  # Mock or adjust for testing
+            year=2019,
+            mileage=20000,
+            pickup_location="Chicago",
+            rental_price=69.99,
+            available_from=date(2023, 4, 1),
+            available_to=date(2023, 9, 30),
         )
 
-    def test_booking_creation(self):
-        # Test if bookings are correctly created
-        self.assertEqual(self.booking.renter.username, 'testuser')
-        self.assertEqual(self.booking.car.model, 'Test Car')
-        self.assertEqual(self.booking.is_confirmed, False)
+    def test_search_with_valid_input(self):
+        # Log in the user
+        self.client.login(username="testuser", password="password")
 
-    def test_confirmed_booking(self):
-        # Test if confirmed booking is correctly created
-        self.assertEqual(self.confirmed_booking.renter.username, 'testuser')
-        self.assertEqual(self.confirmed_booking.car.model, 'Test Car')
-        self.assertEqual(self.confirmed_booking.is_confirmed, True)
+        # Send a GET request to search for cars with model 'Toyota' and year '2020'
+        response = self.client.get('/cars/', {'model': 'Toyota', 'year': 2020})
 
-    def test_booking_dates(self):
-        # Test if the booking dates are correct
-        self.assertEqual(self.booking.start_date, datetime(2025, 3, 29))
-        self.assertEqual(self.booking.end_date, datetime(2025, 4, 5))
+        # Check that the response is successful (status code 200)
+        self.assertEqual(response.status_code, 200)
 
-    def test_car_availability(self):
-        # Test car availability within the given period
-        car = self.car
-        self.assertTrue(car.available_from <= self.booking.start_date <= car.available_to)
-        self.assertTrue(car.available_from <= self.confirmed_booking.start_date <= car.available_to)
+        # Check that the car with model 'Toyota Camry' appears in the response content
+        self.assertContains(response, 'Toyota Camry')
+
+        # Check that cars that do not match the criteria do not appear in the response
+        self.assertNotContains(response, 'Honda Accord')
+        self.assertNotContains(response, 'Ford Mustang')
+
+    def test_search_with_no_results(self):
+        # Log in the user
+        self.client.login(username="testuser", password="password")
+
+        # Search with a model that doesn't exist
+        response = self.client.get('/cars/', {'model': 'Nonexistent Model', 'year': 2025})
+
+        # Check that the response is successful (status code 200)
+        self.assertEqual(response.status_code, 200)
+
+        # Check that no cars appear in the response
+        self.assertNotContains(response, 'Toyota Camry')
+        self.assertNotContains(response, 'Honda Accord')
+        self.assertNotContains(response, 'Ford Mustang')

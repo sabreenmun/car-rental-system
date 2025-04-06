@@ -12,10 +12,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from notifications.models import Notification
 import random
-from designpatterns.carbuilder import CarBuilder
+from designpatterns.carbuilder import CarBuilder, CarDirector, ConcreteCarBuilder
 from designpatterns.proxy import Client
 from django.db.models import Q 
 from notifications.models import Review
+from designpatterns.mediator import *
 
 #method to view car list
 @login_required
@@ -40,24 +41,29 @@ def car_create(request):
     if request.method == "POST":
         form = CarForm(request.POST, request.FILES)
         if form.is_valid():
-            #using the CarBuilder design pattern
-            builder = CarBuilder()
             
+            #instantiate the concretebuilder
+            car = ConcreteCarBuilder()
+
+            #instantiate the director (hire the engineer)
+            director = CarDirector(car)
+  
             #prepare dates from form if they exist
             available_from = form.cleaned_data['available_from'] if form.cleaned_data.get('available_from') else None
             available_to = form.cleaned_data['available_to'] if form.cleaned_data.get('available_to') else None
-
-            # Build the car object using the builder
-            car = (builder
-                   .set_owner(request.user)
-                   .set_model(form.cleaned_data['model'])
-                   .set_image(form.cleaned_data['image'])
-                   .set_year(form.cleaned_data['year'])
-                   .set_mileage(form.cleaned_data['mileage'])
-                   .set_pickup_location(form.cleaned_data['pickup_location'])
-                   .set_rental_price(form.cleaned_data['rental_price'])
-                   .set_available_dates(available_from, available_to)  #using available_from and available_to
-                   .build())
+           
+            #use the Director to build the car
+            car = director.construct_car(
+                owner=request.user,
+                model=form.cleaned_data['model'],
+                image=form.cleaned_data['image'],
+                year=form.cleaned_data['year'],
+                mileage=form.cleaned_data['mileage'],
+                pickup_location=form.cleaned_data['pickup_location'],
+                rental_price=form.cleaned_data['rental_price'],
+                available_from=available_from,
+                available_to=available_to
+            )
             
             #save the car instance
             car.save()
@@ -67,6 +73,7 @@ def car_create(request):
         form = CarForm()
 
     return render(request, "cars/car_form.html", {"form": form})
+
 
 #method to update a listing
 class CarUpdateView(LoginRequiredMixin, UpdateView):
@@ -107,7 +114,6 @@ class CarUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('car_list')
 
-#method to view details of a car listing
 class CarDetailView(DetailView):
     model = Car
     template_name = 'cars/car_detail.html'
@@ -117,16 +123,20 @@ class CarDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         car = self.get_object()
 
-  
-        booking = Booking.objects.filter(car=car).first()  
-        context['booking'] = booking 
+        today = date.today()  #today's date
 
-        
+        #get the first booking related to the car
+        booking = Booking.objects.filter(car=car).first()  
+        context['booking'] = booking
+
+        #pass today's date to the context
+        context['today'] = today
+
         #get all reviews related to the car
-        reviews = Review.objects.filter(car=car)  #get all reviews for the car
+        reviews = Review.objects.filter(car=car)
         context['reviews'] = reviews
-        
-        return context 
+
+        return context
 
 #method to delete a car listing
 @login_required
@@ -187,8 +197,6 @@ def book_car(request, car_id):
 
             #store the booking ID temporarily in session for payment processing
             request.session['booking_id'] = booking.id
-
-            messages.success(request, "Booking successful! Proceed to payment.")
             return redirect("process_payment", booking.id)
 
     else:
@@ -281,20 +289,33 @@ def my_bookings(request):
         "today": date.today()  #pass today's date to compare with booking end dates
     })
 
-#method to search a car based on different things
+#method to search car basedo n conditions
 @login_required
 def car_search(request):
     form = CarSearchForm(request.GET)
     cars = Car.objects.all()
 
+    # form validation
     if form.is_valid():
         model = form.cleaned_data.get('model')
         rental_price_min = form.cleaned_data.get('rental_price_min')
         rental_price_max = form.cleaned_data.get('rental_price_max')
-        from_date = form.cleaned_data.get('from_date')
-        to_date = form.cleaned_data.get('to_date')
+        available_from = form.cleaned_data.get('available_from')
+        available_to = form.cleaned_data.get('available_to')
 
-        #filter based on model and price range
+        #validate rental price range
+        if rental_price_min and rental_price_max and rental_price_min > rental_price_max:
+            form.add_error('rental_price_max', 'Max rental price cannot be less than min rental price.')
+
+        #validate the date range
+        if available_from and available_to and available_from > available_to:
+            form.add_error('available_to', 'Available to date cannot be before available from date.')
+
+        #if there are any errors, render it without applying any filters
+        if form.errors:
+            return render(request, "cars/car_search.html", {"form": form, "cars": cars})
+
+        #filter based on model, price, and dates
         if model:
             cars = cars.filter(model__icontains=model)
         if rental_price_min:
@@ -302,27 +323,27 @@ def car_search(request):
         if rental_price_max:
             cars = cars.filter(rental_price__lte=rental_price_max)
 
-        #filter cars based on availability for the selected date range
-        if from_date and to_date:
+        #based on availability dates
+        if available_from and available_to:
             available_cars = []
             for car in cars:
-                #check if the car is available for the selected date range
-                if car.is_available(from_date, to_date):
-                    #check for any existing bookings that conflict with the requested dates
+                if car.is_available(available_from, available_to):
                     conflicting_bookings = Booking.objects.filter(car=car, is_confirmed=True)
                     available = True
                     for booking in conflicting_bookings:
-                        if (from_date <= booking.end_date) and (to_date >= booking.start_date):
+                        #if another car booked it
+                        if available_from <= booking.end_date and available_to >= booking.start_date:
                             available = False
                             break
-                    
                     if available:
                         available_cars.append(car)
 
-            #update the cars queryset to only include available cars
-            cars = Car.objects.filter(id__in=[car.id for car in available_cars])
+            #update car set
+            cars = cars.filter(id__in=[car.id for car in available_cars])
 
     return render(request, "cars/car_search.html", {"form": form, "cars": cars})
+
+
 
 #method to update a car booking for owners
 @login_required
@@ -357,7 +378,7 @@ def update_booking(request, booking_id):
         )
 
         if conflicting_bookings.exists():
-            messages.error(request, "The selected dates conflict with another confirmed booking. Please choose different dates.")
+            messages.error(request, "The selected dates overlap with another confirmed booking. Please choose different dates.")
             return render(request, 'cars/update_booking.html', {'booking': booking})
 
         #update the booking dates if no conflicts
@@ -390,7 +411,7 @@ def update_booking(request, booking_id):
     return render(request, 'cars/update_booking.html', {'booking': booking})
 
 
-#for car owners to delete a booking
+#for car owners/renters to delete a booking
 @login_required
 def delete_booking(request, booking_id):
     booking = Booking.objects.get(id=booking_id)
@@ -398,7 +419,6 @@ def delete_booking(request, booking_id):
     
     today = date.today()
     if booking.start_date <= today <= booking.end_date or booking.end_date < today:
-        messages.error(request, "You cannot delete a booking that is in progress or has ended.")
         return redirect(reverse('car_detail', kwargs={'pk': car.id}))
     
     #check if the user is the car owner or the renter of the booking
@@ -408,8 +428,10 @@ def delete_booking(request, booking_id):
     
     #delete the booking
     booking.delete()
-    messages.success(request, "Booking deleted successfully.")
 
-    #redirect to the car detail page using pk (the car's id)
-    return redirect(reverse('car_detail', kwargs={'pk': car.id}))
-
+    #if it's the car owner's page, redirect to car_detail page
+    if request.user == car.owner:
+        return redirect(reverse('car_detail', kwargs={'pk': car.id}))
+    
+    #if it's the renter's page, redirect to my_bookings page
+    return redirect(reverse('my_bookings'))
