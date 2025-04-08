@@ -3,7 +3,7 @@ from datetime import timedelta
 from cars.models import Car
 from abc import ABC, abstractmethod
 
-# abstract builder
+#abstract builder
 class CarBuilder(ABC):
     @abstractmethod
     def set_owner(self, owner):
@@ -41,7 +41,7 @@ class CarBuilder(ABC):
     def build(self):
         pass
 
-# Concrete builder class
+#concrete builder class
 class ConcreteCarBuilder(CarBuilder):
     def __init__(self):
         self.car = Car()  # create a new car object to build
@@ -83,7 +83,7 @@ class ConcreteCarBuilder(CarBuilder):
         return self.car
 
 
- # Director class (Car Director)
+ #director class
 class CarDirector:
     def __init__(self, builder: CarBuilder):
         self.builder = builder

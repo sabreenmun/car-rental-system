@@ -9,10 +9,9 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from designpatterns.observer import ConcreteObserver, NotificationSystem
 
-#method to 
+#method to show all convos based on user type
 @login_required
 def inbox(request):
-    """ show allof conversations based on the user type """
     if request.user.is_superuser: 
         conversations = Conversation.objects.filter(owner=request.user).order_by("-last_updated")
     else: 
@@ -20,10 +19,8 @@ def inbox(request):
 
     return render(request, "message/inbox.html", {"conversations": conversations})
 
-from notifications.models import Notification
 
-
-#method to delete a convo
+#method to delete a conversation
 @login_required
 def delete_conversation(request, conversation_id):
     if request.method == "POST":
@@ -38,7 +35,7 @@ def delete_conversation(request, conversation_id):
     
     return redirect("inbox")
 
-#method to use chatroom. 
+#method to create message
 @login_required
 def chat_room(request, conversation_id):
     conversation = get_object_or_404(Conversation, id=conversation_id)
@@ -52,7 +49,7 @@ def chat_room(request, conversation_id):
             message_text = form.cleaned_data['text']
             receiver = conversation.owner if request.user == conversation.renter else conversation.renter
 
-            # Create the message
+            #create the message
             message = Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
@@ -60,7 +57,7 @@ def chat_room(request, conversation_id):
                 text=message_text
             )
 
-            #create the notification System (subject)
+            #create the notification system (subject)
             notification_system = NotificationSystem()
 
             #create a concrete observer for the receiver (car owner or renter)
@@ -93,10 +90,9 @@ def chat_room(request, conversation_id):
         "form": form,
     })
 
-
+#method to begin a convo (car renter first time new convo)
 @login_required
 def start_conversation(request, car_id):
-    """Car Renter first time message pathale new conversation create hobe"""
     car = get_object_or_404(Car, id=car_id)
     owner = car.owner  
 

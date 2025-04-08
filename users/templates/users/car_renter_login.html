@@ -1,3 +1,4 @@
+<!--This page is where renters login-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,7 +149,7 @@
             opacity: 0.8;
         }
     </style>
-    <!-- add poppins font from Google Fonts -->
+    <!-- add poppins font from gogle fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -159,7 +160,7 @@
             {{ form.as_p }}
             <button type="submit">Login</button>
               
-        <!-- Display messages -->
+        <!-- display messages -->
         <div class="container mt-3">
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">

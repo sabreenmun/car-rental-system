@@ -1,3 +1,4 @@
+<!--This is the page to update a car booking.-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,22 +13,22 @@
 <body>
 
     <div class="container mt-5">
-        <!-- Page Header -->
+        <!-- header -->
         <h2 class="text-center mb-4">Update Your Booking Dates</h2>
         <p class="text-center mb-4">Car: {{ booking.car.model }} ({{ booking.car.year }})</p>
         <p class="text-center mb-4">Current Dates: {{ booking.start_date|date:"m-d-Y" }} to {{ booking.end_date|date:"m-d-Y" }}</p>
 
-        <!-- Form to Update Dates -->
+        <!-- form to update booking -->
         <form method="POST">
             {% csrf_token %}
             
-            <!-- Start Date Field -->
+            <!-- start date field -->
             <div class="mb-4">
                 <label for="start_date" class="form-label">New Start Date</label>
                 <input type="date" id="start_date" name="start_date" class="form-control" value="{{ booking.start_date|date:"Y-m-d" }}" required>
             </div>
 
-            <!-- End Date Field -->
+            <!-- end date field -->
             <div class="mb-4">
                 <label for="end_date" class="form-label">New End Date</label>
                 <input type="date" id="end_date" name="end_date" class="form-control" value="{{ booking.end_date|date:"Y-m-d" }}" required>
@@ -35,17 +36,14 @@
             <div class="text-center">
                 <div class="messages">
                     {% if messages %}
+                    <ul>
                         {% for message in messages %}
-                            <div class="{{ message.tags }}">
-                                {{ message }}
-                            </div>
+                            <li>{{ message }}</li>
                         {% endfor %}
-                        {% for message in messages %}
-                            {% message.clear %}
-                        {% endfor %}
-                    {% endif %}
+                    </ul>
+                {% endif %}  
                 </div>
-            <!-- Submit Button -->
+            <!-- submit button -->
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary w-100 mb-3">
                     <i class="fas fa-edit me-2"></i>Update Dates
@@ -54,7 +52,7 @@
             
         </form>
 
-      <!-- Cancel Button -->
+      <!-- cancel button -->
     <div class="text-center mt-3">
         <a href="{% url 'my_bookings' %}" class="btn btn-outline-secondary w-100">
             <i class="fas fa-arrow-left me-2"></i>Cancel

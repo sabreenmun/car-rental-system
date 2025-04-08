@@ -2,6 +2,7 @@ from django.db import models
 from cars.models import Car, Booking
 from django.conf import settings
 
+#model for notification
 class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     message = models.TextField()
@@ -11,6 +12,7 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.user.username} - {self.message[:20]}"
 
+#model for a review
 class Review(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)  # No default datetime
     reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="given_reviews")

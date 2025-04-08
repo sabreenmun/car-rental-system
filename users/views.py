@@ -10,8 +10,10 @@ from designpatterns.singleton import Singleton
 from django.utils import timezone
 from django.contrib import messages
 from cars.models import Car, Booking
+from django.contrib.messages import get_messages
 User = get_user_model()
 
+#method to register as a car renter
 def car_renter_register(request):
     if request.method == "POST":
         form = CarRenterRegistrationForm(request.POST)
@@ -39,32 +41,33 @@ def car_renter_register(request):
     
     return render(request, 'users/car_renter_register.html', {'form': form})
 
+#method to login as a car renter
 def car_renter_login(request):
-    storage = messages.get_messages(request)
-    storage.used = True 
-    
+    get_messages(request).used = True
     if request.method == "POST":
         form = CarRenterLoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+            #authenticate the user with provided credentials
             user = authenticate(request, username=username, password=password)
             
             if user is not None and not user.is_superuser:
-                session_manager = Singleton()  #singleton instance
-                session_manager.login_user(request, user)
+                session_manager = Singleton()   #get singleton instance
+                session_manager.login_user(request, user)  #log user in using singleton
                 return redirect('car_list')
             else:
                 #invalid creds
                 messages.error(request, 'Invalid credentials for a car renter.')
         else:
-            #if form invalid
+            #if form validation fails
             messages.error(request, 'There was an error with your login form.')
     else:
         form = CarRenterLoginForm()
 
     return render(request, 'users/car_renter_login.html', {'form': form})
 
+#method to request a pass reset for car renter
 def request_password_reset(request):
     if request.method == "POST":
         form = PasswordResetForm(request.POST)
@@ -82,7 +85,7 @@ def request_password_reset(request):
 
     return render(request, 'users/request_password_reset.html', {'form': form})
 
-
+#method for verification for car renters.
 def verify_security_questions(request):
     user_id = request.session.get('reset_user_id')
     if not user_id:
@@ -125,7 +128,7 @@ def verify_security_questions(request):
     # make sure a response is returned in all cases
     return render(request, 'users/verify_security_questions.html', {'form': form})
 
-
+#method to set new pass for car renter
 def set_new_password(request):
     if not request.session.get('security_verified'):
         return redirect('request_password_reset')
@@ -148,7 +151,7 @@ def set_new_password(request):
         form = SetNewPasswordForm()
     return render(request, 'users/set_new_password.html', {'form': form})
 
-
+#method to view profile for car renter
 @login_required
 def profile(request):
     user = request.user
@@ -180,7 +183,7 @@ def profile(request):
     })
 
 
-#log out!
+#method to logout all users
 def user_logout(request):
     
     if request.user.is_superuser:

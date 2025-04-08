@@ -1,104 +1,64 @@
-from abc import ABC, abstractmethod
-from cars.models import Car, Booking
-from cars.forms import CarSearchForm
+#This is where the mediator pattern functionality goes.
+from django.db.models import Q
+from django.contrib import messages
+from cars.models import Booking
 
-
-#mediator interface
-class Mediator(ABC):
-    @abstractmethod
-    def mediate(self, form, request):
-        pass
-
+#mediator
+class BookingMediatorInterface:
+    def process_booking(self):
+        raise NotImplementedError
 
 #concrete mediator
-class ConcreteMediator(Mediator):
-    def __init__(self):
-        self.colleague1 = None  #CarSearchLogic
-        self.colleague2 = None  #CarSearchFormHandler
-
-    def set_colleague1(self, colleague):
-        self.colleague1 = colleague
-
-    def set_colleague2(self, colleague):
-        self.colleague2 = colleague
-
-    def mediate(self, form, request):
-        #mediator coordinates the behavior between colleagues
-        if self.colleague2.validate(form):  #validate the form
-            return self.colleague1.filter_cars(form)  #filter cars if validation is successful
-        return None
-
-
-#colleague 1: CarSearchLogic
-class CarSearchLogic:
-    def __init__(self, request):
+class BookingMediator(BookingMediatorInterface):
+    def __init__(self, request, car, form):
         self.request = request
-
-    def filter_cars(self, form):
-        cars = Car.objects.all()
-
-        # Filtering based on the form data
-        model = form.cleaned_data.get('model')
-        rental_price_min = form.cleaned_data.get('rental_price_min')
-        rental_price_max = form.cleaned_data.get('rental_price_max')
-        available_from = form.cleaned_data.get('available_from')
-        available_to = form.cleaned_data.get('available_to')
-
-        if model:
-            cars = cars.filter(model__icontains=model)
-        if rental_price_min:
-            cars = cars.filter(rental_price__gte=rental_price_min)
-        if rental_price_max:
-            cars = cars.filter(rental_price__lte=rental_price_max)
-
-        # Filter based on availability dates
-        if available_from and available_to:
-            cars = self.filter_by_availability(cars, available_from, available_to)
-
-        return cars
-
-    def filter_by_availability(self, cars, available_from, available_to):
-        # Filter cars that are available in the specified date range
-        available_cars = []
-        
-        for car in cars:
-            # Get all bookings for this car
-            bookings = Booking.objects.filter(car=car)
-
-            # Check if the car is available during the specified date range
-            is_available = True
-            for booking in bookings:
-                # Compare booking dates with the search range
-                if (available_from <= booking.available_to and available_to >= booking.available_from):
-                    is_available = False
-                    break  # If there's a conflict, the car is not available
-
-            if is_available:
-                available_cars.append(car)
-
-        return available_cars
-
-
-#colleague 2: CarSearchFormHandler
-class CarSearchFormHandler:
-    def __init__(self, form):
+        self.car = car
         self.form = form
+        self.booking = None
+    #main method to process the booking
+    def process_booking(self):
+        self.booking = self.form.save(commit=False)
+        self.booking.car = self.car
+        self.booking.renter = self.request.user
 
-    def validate(self, form):
-        if form.is_valid():
-            # Validation logic for rental prices
-            rental_price_min = form.cleaned_data.get('rental_price_min')
-            rental_price_max = form.cleaned_data.get('rental_price_max')
-            available_from = form.cleaned_data.get('available_from')
-            available_to = form.cleaned_data.get('available_to')
+        #check if car has those dates available
+        if not self._is_within_availability():
+            messages.error(self.request, "Selected dates are outside the car's availability range.")
+            return False
 
-            if rental_price_min and rental_price_max and rental_price_min > rental_price_max:
-                form.add_error('rental_price_max', "The 'Max Rental Price' cannot be less than the 'Min Rental Price'.")
-                return False
+        #check if overlaps w another booking
+        if self._has_conflicts():
+            messages.error(self.request, "This car is already booked for the selected dates.")
+            return False
 
-            if available_from and available_to and available_from > available_to:
-                form.add_error('available_to', "The 'Available To' date cannot be earlier than the 'Available From' date.")
-                return False
+        #check if start date before end date
+        if not self._is_duration_valid():
+            messages.error(self.request, "End date must be after start date.")
+            return False
+        
+        # finalize the booking if all checks pass
+        self._finalize_booking()
+        return True
 
-            return True
-        return False
+    def _is_within_availability(self):
+        return (self.car.available_from <= self.booking.start_date and 
+                self.car.available_to >= self.booking.end_date)
+
+    def _has_conflicts(self):
+        return Booking.objects.filter(
+            car=self.car,
+            is_confirmed=True,
+        ).filter(
+            Q(start_date__lt=self.booking.end_date) & Q(end_date__gt=self.booking.start_date)
+        ).exists()
+
+    def _is_duration_valid(self):
+        total_days = (self.booking.end_date - self.booking.start_date).days
+        return total_days >= 1
+
+    def _finalize_booking(self):
+        total_days = (self.booking.end_date - self.booking.start_date).days
+        self.booking.total_price = self.car.rental_price * total_days
+        self.booking.status = 'pending'
+        self.booking.save()
+        self.request.session['booking_id'] = self.booking.id

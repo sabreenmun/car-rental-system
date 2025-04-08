@@ -2,6 +2,7 @@ from django import forms
 from .models import *
 from datetime import date
 
+#form to post a car with fields required!
 class CarForm(forms.ModelForm):
     available_from = forms.DateField(
         widget=forms.DateInput(attrs={"type": "date", "class": "datepicker", "placeholder": "Select start date"}),
@@ -14,6 +15,8 @@ class CarForm(forms.ModelForm):
         label="Available To"
     )
 
+    #make sure year is between 1900-2099
+    #make sure availability is valid
     class Meta:
         model = Car
         fields = ["model", "image", "year", "mileage", "pickup_location", "rental_price", "available_from", "available_to"]
@@ -37,7 +40,9 @@ class CarForm(forms.ModelForm):
         
         return cleaned_data
 
+#form to book car
 class BookingForm(forms.ModelForm):
+    #make sure dates are valid!
     class Meta:
         model = Booking
         fields = ["start_date", "end_date"]
@@ -57,6 +62,7 @@ class BookingForm(forms.ModelForm):
         
         return cleaned_data
 
+#form to search for a car
 class CarSearchForm(forms.Form):
     model = forms.CharField(
         required=False,

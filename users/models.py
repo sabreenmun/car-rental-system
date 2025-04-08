@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-
+#model for a custom user
 class CustomUser(AbstractUser):
     USER_TYPES = (
         ('renter', 'Car Renter'),
@@ -10,6 +10,7 @@ class CustomUser(AbstractUser):
     )
     user_type = models.CharField(max_length=10, choices=USER_TYPES, default='renter')  
 
+#model for a car renter
 class CarRenter(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     security_question_1 = models.CharField(max_length=255)

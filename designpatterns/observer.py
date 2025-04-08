@@ -1,19 +1,19 @@
-# designpatterns/observer.py
+#This is where the observer pattern functionality goes.
 from abc import ABC, abstractmethod
 from notifications.models import Notification
 
 #SUBJECT INTERFACE
 class Subject(ABC):
     @abstractmethod
-    def register_observer(self, observer):
+    def register_observer(self, observer): #to add an observver
         pass
 
     @abstractmethod
-    def remove_observer(self, observer):
+    def remove_observer(self, observer): #to remove an observer
         pass
 
     @abstractmethod
-    def notify_observers(self, message):
+    def notify_observers(self, message): #to notify an observer
         pass
 
 # OBSERVER INTERFACE (Abstract Class)

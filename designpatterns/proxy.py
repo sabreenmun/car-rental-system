@@ -18,7 +18,7 @@ class RealPayment(PaymentInterface):
         print(f"Real payment of ${amount} for user {user} processed.")
         return True  # simulate a successful payment (only for this project)
 
-# PROXY
+#PROXY
 class PaymentProxy(PaymentInterface):
     def __init__(self):
         self.real_payment = RealPayment()  #create an instance of the RealPayment (aka the real subject)
@@ -28,7 +28,7 @@ class PaymentProxy(PaymentInterface):
         print(f"Proxy handling payment of ${amount} for user {user}")
         return self.real_payment.pay(amount, user)
 
-# CLIENT
+#CLIENT
 class Client:
     def __init__(self):
         self.payment_interface = PaymentProxy() #use PROXY interface, client is the gateway

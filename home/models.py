@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 
+#car owner model - first they are a basic user, then set them as owner.
 class CarOwner(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     security_question_1 = models.CharField(max_length=255)

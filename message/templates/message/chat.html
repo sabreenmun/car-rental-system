@@ -1,3 +1,4 @@
+<!--chatbox page-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,7 +95,7 @@
             background: #644517;
         }
 
-        /* Navigation Buttons */
+       
         .navigation-buttons {
             display: flex;
             justify-content: space-between;
@@ -120,16 +121,16 @@
 </head>
 <body>
     <div id="chat-container">
-        <!-- Navigation Buttons -->
+        <!-- nav buttons -->
         <div class="navigation-buttons">
             <a href="{% url 'inbox' %}">Back to Inbox</a>
             <a href="{% url 'profile' %}">Back to Profile</a>
         </div>
 
-        <!-- Chat Header -->
+        <!-- chat header -->
         <h2 style="padding: 15px; background: #825b21; color: #fff; margin: 0;">Chat Room</h2>
 
-        <!-- Chat Messages -->
+        <!-- chat messages -->
         <div id="chat-box">
             {% for message in messages %}
                 <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
@@ -138,7 +139,7 @@
             {% endfor %}
         </div>
 
-        <!-- Chat Form -->
+        <!-- chat form -->
         <form id="chat-form">
             {% csrf_token %}
             <input type="text" id="message-text" placeholder="Type your message...">

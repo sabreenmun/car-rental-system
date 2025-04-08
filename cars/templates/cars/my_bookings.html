@@ -1,3 +1,4 @@
+<!--This is the page for renters to see their bookings.-->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -67,31 +68,31 @@
     }
 
     .card-body {
-        flex-grow: 1; /* This ensures that the card body takes up as much space as possible */
+        flex-grow: 1;
     }
 
     .container .row {
         display: flex;
-        flex-wrap: wrap; /* Allow cards to wrap to the next line if necessary */
-        gap: 1rem; /* Optional: Add some spacing between the cards */
+        flex-wrap: wrap; 
+        gap: 1rem; 
     }
 
     .col-md-4 {
-        flex: 1 0 30%; /* Ensures that each card takes up 30% of the row width, allowing 3 cards per row */
-        max-width: 33.33%; /* Max width of the column to make sure we get exactly 3 items */
-        padding: 0 1rem; /* Add padding between cards */
+        flex: 1 0 30%; 
+        max-width: 33.33%; 
+        padding: 0 1rem; 
     }
 
     .card-img-top {
         width: 100%;
-        height: 200px; /* Optional: fix the image size to avoid inconsistency */
-        object-fit: cover; /* Ensure the image covers the area without distortion */
+        height: 200px; 
+        object-fit: cover; 
     }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
+<!-- navbar -->
 <header class="header">
     <div class="logo">🚗 DriveShare</div>
     <button class="navbar-toggler" type="button">
@@ -142,14 +143,14 @@
                             <strong>Booking Dates:</strong> {{ booking.start_date }} to {{ booking.end_date }}<br>
                             <strong>Status:</strong> 
                             {% if booking.start_date >= today %}
-                                <!-- Future/Upcoming booking -->
+                                <!-- future booking -->
                                 {% if booking.is_confirmed %}
                                     Confirmed
                                 {% else %}
                                     <a href="{% url 'process_payment' booking.id %}" class="btn btn-light btn-sm">Unconfirmed. Proceed to Payment</a>
                                 {% endif %}
                             {% else %}
-                                <!-- Past booking -->
+                                <!-- completed booking -->
                                 {% if booking.is_confirmed %}
                                     Completed
                                 {% else %}
@@ -157,17 +158,17 @@
                                 {% endif %}
                             {% endif %}
                         </p>
-                        <!-- Display the 'Leave Review' button only if the booking has ended and no review exists -->
+                        <!-- show the 'Leave Review' button only if the booking has ended and no review exists -->
                         {% if booking.end_date < today %}
                             {% if booking.review_set.exists %}
-                                <!-- If the booking has already been reviewed -->
+                                <!-- if the booking has already been reviewed -->
                                 <span class="btn btn-secondary btn-sm">Reviewed</span>
                             {% else %}
-                                <!-- If the booking has ended but no review exists -->
+                                <!-- if the booking has ended but no review exists -->
                                 <a href="{% url 'submit_review' booking.id %}" class="btn btn-warning btn-sm">Leave Review</a>
                             {% endif %}
                         {% else %}
-                            <!-- Display 'Cancel' button if the booking has not ended -->
+                            <!-- show 'Cancel' button if the booking has not ended -->
                             <form action="{% url 'delete_booking' booking.id %}" method="POST" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger btn-sm">Cancel</button>

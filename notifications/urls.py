@@ -1,7 +1,7 @@
-
 from django.urls import path
 from .views import *
 
+#urls for navigation
 urlpatterns = [
     path('', notifications, name='notifications'),
     path('notification/delete/<int:notification_id>/', delete_notification, name='delete_notification'),

@@ -1,3 +1,4 @@
+<!--inbox messaging page (sender/receiver)-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inbox</title>
     <style>
-        /* General Styles */
+       
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -18,7 +19,7 @@
             color: #333;
         }
 
-        /* Container */
+     
         .inbox-container {
             width: 90%;
             max-width: 800px;
@@ -29,7 +30,7 @@
             position: relative;
         }
 
-        /* Header */
+      
         h1 {
             text-align: center;
             color: #000000;
@@ -38,7 +39,6 @@
             font-weight: bold;
         }
 
-        /* Conversation List */
         ul {
             list-style: none;
             padding: 0;
@@ -52,7 +52,7 @@
             align-items: center;
         }
 
-        /* Conversation Card */
+       
         .conversation-card {
             background-color: #f9f9f9;
             border-radius: 10px;
@@ -89,7 +89,7 @@
             color: #666;
         }
 
-        /* Delete Button */
+    
         .delete-form {
             margin-left: 15px;
         }
@@ -108,7 +108,7 @@
             background-color: rgb(82, 5, 5);
         }
 
-        /* No Conversations Message */
+     
         .no-conversations {
             text-align: center;
             color: #666;
@@ -116,7 +116,7 @@
             margin-top: 20px;
         }
 
-        /* Back to Home Button */
+   
         .back-home-btn {
             text-align: center;
             margin-top: 20px;
@@ -143,7 +143,7 @@
         <ul>
             {% for conversation in conversations %}
                 <li>
-                    <!-- Conversation Card -->
+                    <!-- convo card -->
                     <div class="conversation-card">
                         <a href="{% url 'chat_room' conversation.id %}">
                             <h3>
@@ -158,7 +158,7 @@
                         </a>
                     </div>
 
-                    <!-- Delete Button -->
+                    <!-- delete button -->
                     <form class="delete-form" method="POST" action="{% url 'delete_conversation' conversation.id %}">
                         {% csrf_token %}
                         <button type="submit" class="delete-btn">Delete</button>
@@ -169,7 +169,7 @@
             {% endfor %}
         </ul>
 
-        <!-- Back to Home Button -->
+        <!-- home button -->
         <div class="back-home-btn">
             <a href="{% url 'profile' %}">Back to Profile</a>
         </div>

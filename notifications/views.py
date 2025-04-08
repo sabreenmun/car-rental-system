@@ -26,10 +26,12 @@ def delete_notification(request, notification_id):
     if notification.user == request.user:
         notification.delete()
         messages.success(request, "Notification deleted successfully!")
+        #make sure redirect to the right page after deletion
+        return redirect('notifications')  #redirect to the notifications page
     else:
         messages.error(request, "You are not authorized to delete this notification.")
-    
-    return redirect('notifications')
+        #redirect to the notifications page on fail as well
+        return redirect('notifications')
 
 #method to submit a review
 @login_required

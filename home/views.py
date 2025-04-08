@@ -8,6 +8,7 @@ from .forms import *
 from django.http import HttpResponse
 from designpatterns.cors import SecurityQuestion1Handler, SecurityQuestion2Handler, SecurityQuestion3Handler
 from designpatterns.singleton import Singleton
+from django.contrib.messages import get_messages
 
 User = get_user_model()
 
@@ -24,8 +25,9 @@ def contact(request):
 def help(request):
     return render(request, 'home/help.html')
 
-
+#method register a car owner
 def car_owner_register(request):
+    get_messages(request).used = True
     if request.method == "POST":
         form = CarOwnerRegistrationForm(request.POST)
         if form.is_valid():
@@ -34,6 +36,7 @@ def car_owner_register(request):
             user.is_superuser = True  
             user.save()
 
+            #store security questions and user/pass/email from user model
             car_owner = CarOwner(
                 user=user,
                 security_question_1=form.cleaned_data['security_question_1'],
@@ -52,7 +55,7 @@ def car_owner_register(request):
     
     return render(request, 'home/car_owner_register.html', {'form': form})
 
-
+#method to allow owners to login
 def car_owner_login(request):
     storage = messages.get_messages(request)
     storage.used = True 
@@ -62,15 +65,18 @@ def car_owner_login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+             #authenticate the user with provided credentials
             user = authenticate(request, username=username, password=password)
             if user is not None and user.is_superuser:
-                session_manager = Singleton()  # Singleton instance
-                session_manager.login_user(request, user)
+                session_manager = Singleton()  #get singleton instance
+                session_manager.login_user(request, user)  #log user in using singleton
         
                 return redirect('car_list')
             else:
+                #invalid creds
                 messages.error(request, 'Invalid credentials for a car owner.')
         else:
+            #if form validation fails
             messages.error(request, 'Invalid form submission. Please try again.')
 
     else:
@@ -78,7 +84,7 @@ def car_owner_login(request):
 
     return render(request, 'home/car_owner_login.html', {'form': form})
 
-
+#method to request a password reset for owners
 def request_password_reset(request):
     if request.method == "POST":
         form = PasswordResetForm(request.POST)
@@ -96,7 +102,7 @@ def request_password_reset(request):
 
     return render(request, 'home/register_password_reset.html', {'form': form})
 
-
+#message to handle the 3 seucirty quesitons
 def verify_security_questions(request):
     user_id = request.session.get('reset_user_id')
     if not user_id:
@@ -138,7 +144,7 @@ def verify_security_questions(request):
     # make sure a response is returned in all cases
     return render(request, 'home/verify_security_questions.html', {'form': form})
 
-
+#method to set new password
 def set_new_password(request):
     if not request.session.get('security_verified'):
         return redirect('request_password_reset')
@@ -164,7 +170,7 @@ def set_new_password(request):
     return render(request, 'home/set_new_password.html', {'form': form})
 
 
-
+#method to choose login as owner or renter
 def login_choice(request):
     if request.method == 'POST':
         form = LoginChoiceForm(request.POST)
@@ -179,7 +185,7 @@ def login_choice(request):
 
     return render(request, 'home/login_choice.html', {'form': form})
 
-
+#method to register as car owner or renter
 def register_choice(request):
     return render(request, 'home/register_choice.html')  
 

@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import *
 
+#paths for navigation!
 urlpatterns = [
     path('', car_list, name="car_list"),
     path("add/", car_create, name="car_create"),

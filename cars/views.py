@@ -16,7 +16,8 @@ from designpatterns.carbuilder import CarBuilder, CarDirector, ConcreteCarBuilde
 from designpatterns.proxy import Client
 from django.db.models import Q 
 from notifications.models import Review
-from designpatterns.mediator import *
+from designpatterns.mediator import BookingMediator
+from designpatterns.observer import ConcreteObserver, NotificationSystem
 
 #method to view car list
 @login_required
@@ -52,7 +53,7 @@ def car_create(request):
             available_from = form.cleaned_data['available_from'] if form.cleaned_data.get('available_from') else None
             available_to = form.cleaned_data['available_to'] if form.cleaned_data.get('available_to') else None
            
-            #use the Director to build the car
+            #use the director to build the car
             car = director.construct_car(
                 owner=request.user,
                 model=form.cleaned_data['model'],
@@ -114,6 +115,7 @@ class CarUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('car_list')
 
+#view cars detail
 class CarDetailView(DetailView):
     model = Car
     template_name = 'cars/car_detail.html'
@@ -143,6 +145,7 @@ class CarDetailView(DetailView):
 def car_delete(request, car_id):
     car = get_object_or_404(Car, id=car_id)
 
+    #check if user is a car owner that owns the car
     if car.owner != request.user:
         return HttpResponseForbidden("You are not allowed to delete this car.")
 
@@ -150,6 +153,7 @@ def car_delete(request, car_id):
         car.delete()
         return redirect("car_list")
 
+    #redirect to confirmation page
     return render(request, "cars/car_confirm_delete.html", {"car": car})
 
 #method to book a car
@@ -158,48 +162,24 @@ def book_car(request, car_id):
     car = get_object_or_404(Car, id=car_id)
 
     if request.method == "POST":
+        #create a booking form instance with the posted data
         form = BookingForm(request.POST)
         if form.is_valid():
-            #create booking object, but don't save yet
-            booking = form.save(commit=False)
-            booking.car = car
-            booking.renter = request.user
-
-            #check if requested dates fall within car's available period
-            if not (car.available_from <= booking.start_date and car.available_to >= booking.end_date):
-                messages.error(request, "Selected dates are outside the car's availability range.")
-                return render(request, "cars/book_car.html", {"form": form, "car": car})
-
-            #check for conflicting bookings
-            conflicting_bookings = Booking.objects.filter(
-                car=car, is_confirmed=True
-            ).filter(
-                Q(start_date__lt=booking.end_date) & Q(end_date__gt=booking.start_date)
-            )
-
-            if conflicting_bookings.exists():
-                messages.error(request, "This car is already booked for the selected dates.")
-                return render(request, "cars/book_car.html", {"form": form, "car": car})
-
-            #ensure at least 1 full day is selected
-            total_days = (booking.end_date - booking.start_date).days
-            if total_days < 1:
-                messages.error(request, "End date must be after start date.")
-                return render(request, "cars/book_car.html", {"form": form, "car": car})
-
-            #calculate total price
-            booking.total_price = car.rental_price * total_days
-            #set the booking status to pending (not confirmed)
-            booking.status = 'pending'  # or a similar status that denotes payment is needed
-
-            #save booking to the database with status as pending
-            booking.save()
-
-            #store the booking ID temporarily in session for payment processing
-            request.session['booking_id'] = booking.id
-            return redirect("process_payment", booking.id)
-
+             #create the mediator instance to handle the booking logic
+            mediator = BookingMediator(request, car, form)
+            #call the process_bookingg function
+            success = mediator.process_booking()
+            if success:
+                # Observer pattern for notifying car owner about booking request
+                notification_system = NotificationSystem()
+                observer = ConcreteObserver(car.owner)
+                notification_system.register_observer(observer)
+                notification_system.notify_observers(f"{request.user.username} has requested to book your car '{car.model}'.")
+                #if successful, send renter to payment process
+                return redirect("process_payment", mediator.booking.id)
+            #if not successful, the mediator already handled the error message
     else:
+        #if not a POST request, initialize an empty form
         form = BookingForm()
 
     return render(request, "cars/book_car.html", {"form": form, "car": car})
@@ -244,6 +224,11 @@ def process_payment(request, booking_id):
         )
         #if payment is successful, confirm booking
         if success:
+            # Notify both renter and owner after successful payment
+            notification_system = NotificationSystem()
+            notification_system.register_observer(ConcreteObserver(request.user))  # renter
+            notification_system.register_observer(ConcreteObserver(booking.car.owner))  # owner
+            notification_system.notify_observers(f"Payment of ${booking.total_price} completed. Booking is now confirmed.")
             booking.is_confirmed = True
             booking.save()
             messages.success(request, f"Payment successful! You have paid ${booking.total_price}. Your booking is confirmed.")

@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import *
 
+#paths for navigation
 urlpatterns = [
     path("inbox/", inbox, name="inbox"),
     path("chat/<int:conversation_id>/", chat_room, name="chat_room"),
