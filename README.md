@@ -6,24 +6,25 @@ DriveShare is a car rental platform that connects car owners with renters. Users
 
 ## Project Setup
 
-## 1. Clone the Project
-Clone the repository to your local machine:
-```bash
-git clone https://github.com/sabreenmun/car-rental-system.git
-```
-
-## 2. Install Python 3.12.9
+## 1. Install Python 3.12.9
 Make sure you have Python 3.12.9 installed. You can check your Python version by running:
 ```bash
 python --version
 ```
-If it's not 3.12.9, download and install it from: https://www.python.org/downloads/release/python-3129/
 
-## 3. Install pipenv
+## 2. Install pipenv
 If you don't have it already, run:
 ```bash
 pip install pipenv
 ```
+
+## 3. Clone the Project
+Clone the repository to your local machine and make sure you're in the car-rental-system directory:
+```bash
+git clone https://github.com/sabreenmun/car-rental-system.git
+cd car-rental-system
+```
+
 ## 4. Set up and activate the virtual environment using Python 3.12.9
 If you have an older version of Python set as default, explicitly tell Pipenv to use Python 3.12.9:
 ```bash
