@@ -39,9 +39,9 @@ python manage.py runserver
 # Owner Account:
 # Username: jonsnow
 # Password: jonsnow
+# He has 3 car listings posted.
 
 # Renter Account:
 # Username: mary
 # Password: mary
-
-
+# She has an ongoing booking, reserves one without paying confirmed, completed one (with review), and has one in the future.
