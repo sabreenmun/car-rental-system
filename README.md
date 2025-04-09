@@ -7,9 +7,10 @@ DriveShare is a car rental platform that connects car owners with renters. Users
 ## Project Setup
 
 ## 1. Install Python 3.12.9
-Make sure you have Python 3.12.9 installed. You can check your Python version by running:
+Make sure you have Python 3.12.9 installed. You can download it from https://www.python.org/downloads/release/python-3129/. You can check your Python version by running:
 ```bash
 python --version
+pip --version
 ```
 
 ## 2. Install pipenv
