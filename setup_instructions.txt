@@ -1,51 +1,47 @@
-1. **Install Dependencies**:
-   - Make sure Python is installed on your system. You can download Python from: https://www.python.org/downloads/
-   - Install Pipenv if you haven’t already:
-     pip install pipenv
+# DriveShare Project Setup Instructions
 
+# 1. Install Python 3.12.9
+# Download it from: https://www.python.org/downloads/release/python-3129/
 
+# 2. Install Pipenv (if you don’t have it yet)
+pip install pipenv
 
-2. **Create a Virtual Environment**:
-   - Use Pipenv to create and activate a virtual environment:
-     pipenv install
-     pipenv shell
+# 3. Navigate to the project directory (where Pipfile is)
+cd path/to/your/project
 
-3. **Install Required Libraries**:
-   - Inside the virtual environment, run the following command to install project dependencies:
-     pipenv install
+# 4. Set up and activate the virtual environment using Python 3.12.9
+pipenv --python 3.12.9
+pipenv install
+pipenv shell
 
-4. **MySQL Database Setup**:
-   - Ensure that you have MySQL installed on your system.
-   - Update the `DATABASES` setting in your `settings.py` file with your MySQL credentials:
-     ```python
-     DATABASES = {
-         'default': {
-             'ENGINE': 'django.db.backends.mysql',
-             'NAME': 'your_db_name',
-             'USER': 'your_mysql_user',
-             'PASSWORD': 'your_mysql_password',
-             'HOST': 'localhost',
-             'PORT': '3306',
-         }
-     }
-     ```
-   - Create a new database in MySQL for the project:
-     ```sql
-     CREATE DATABASE your_db_name;
-     ```
+# 5. Make sure these required dependencies are installed:
+pipenv install Pillow djangorestframework
 
-5. **Run Migrations**:
-   - Run the following command to set up the database schema:
-     python manage.py migrate
+# 6. No need to set up MySQL
+# The project uses SQLite with a preloaded db.sqlite3 file
 
-6. **Create a Superuser (if applicable)**:
-   - To access the Django admin panel, create a superuser by running:
-     python manage.py createsuperuser
+# 7. (Optional) Run migrations if needed
+python manage.py migrate
 
-7. **Start the Development Server**:
-   - Run the following command to start the development server:
-     python manage.py runserver
+# 8. Start the Django development server
+python manage.py runserver
 
-8. **Access the Project**:
-   - Open your web browser and go to `http://127.0.0.1:8000/` to check if the project is running successfully.
+# 9. Visit the app in your browser:
+# http://127.0.0.1:8000/
+
+# 10. Login credentials:
+
+# Admin Panel to view models or add/remove data:
+# http://127.0.0.1:8000/admin/
+# Username: test
+# Password: test
+
+# Owner Account:
+# Username: jonsnow
+# Password: jonsnow
+
+# Renter Account:
+# Username: mary
+# Password: mary
+
 
